@@ -2,8 +2,17 @@ name: Deploy
 
 on:
   push:
-    branches: [ production ]
+    branches: [production]
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Kamal command (default `deploy`; pick `setup` for first-time bootstrap on a new host)'
+        type: choice
+        options:
+          - deploy
+          - setup
+          - redeploy
+        default: deploy
 
 concurrency:
   group: deploy
@@ -13,10 +22,16 @@ permissions:
   packages: write
   contents: read
 
+env:
+  RUBY_VERSION: "3.3.6"
+
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Skip tests on workflow_dispatch with action=setup (first-time host bootstrap
+    # shouldn't be blocked by tests; tests already passed on the commit being deployed).
+    if: ${{ inputs.action != 'setup' }}
 
     services:
       postgres:
@@ -40,12 +55,11 @@ jobs:
       DATABASE_PASSWORD: test_password
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
+          ruby-version: ${{ env.RUBY_VERSION }}
           bundler-cache: true
 
       - name: Set up database
@@ -61,12 +75,16 @@ jobs:
         run: bundle exec bundler-audit check --update
 
   deploy:
+    name: Deploy (${{ inputs.action || 'deploy' }})
     needs: test
+    # Allow setup to run even if test was skipped (test.if was false on action=setup).
+    if: ${{ always() && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 20
 
     env:
+      ACTION: ${{ inputs.action || 'deploy' }}
       DOCKER_BUILDKIT: 1
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       GITHUB_REPOSITORY: ${{ github.repository }}
@@ -81,34 +99,28 @@ jobs:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
+          ruby-version: ${{ env.RUBY_VERSION }}
           bundler-cache: true
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
 
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.9.1
+      - uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy with Kamal
-        run: |
-          # Check if the postgres container exists (running or stopped) via SSH
-          if ssh -o StrictHostKeyChecking=no deploy@$HOST_IP docker container inspect stockerly-postgres &>/dev/null; then
-            bin/kamal deploy
-          else
-            echo "First deploy — bootstrapping with kamal setup..."
-            bin/kamal setup
-          fi
+      - name: Boot accessories (idempotent — only for deploy/redeploy; setup boots them itself)
+        if: env.ACTION != 'setup'
+        run: bin/kamal accessory boot all || true
+
+      - name: Run kamal ${{ env.ACTION }}
+        run: bin/kamal "$ACTION"
 
       - name: Notify Honeybadger of deploy
-        if: success()
+        if: ${{ success() && env.ACTION == 'deploy' }}
         run: |
           curl --silent --show-error \
             --data "deploy[environment]=production&deploy[revision]=${{ github.sha }}&deploy[repository]=${{ github.repository }}&deploy[local_username]=${{ github.actor }}&api_key=$HONEYBADGER_API_KEY" \

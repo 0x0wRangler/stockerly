@@ -1,5 +1,7 @@
 service: stockerly
-image: ghcr.io/<%= ENV["GITHUB_REPOSITORY"] %>
+
+# Image name without registry prefix; Kamal prepends `registry.server` automatically.
+image: <%= ENV["GITHUB_REPOSITORY"] %>
 
 registry:
   server: ghcr.io
@@ -76,3 +78,10 @@ accessories:
         - POSTGRES_PASSWORD
     directories:
       - data:/var/lib/postgresql/data
+
+aliases:
+  console: app exec --reuse --interactive 'bin/rails console'
+  shell: app exec --interactive 'bash'
+  db: accessory exec postgres --interactive 'psql -U stockerly stockerly_production'
+  logs: app logs -f
+  migrate: app exec --reuse 'bin/rails db:migrate'
