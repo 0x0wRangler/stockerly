@@ -42,8 +42,9 @@ gem "faraday-retry"
 # Structured JSON logging for production [https://github.com/roidrage/lograge]
 gem "lograge"
 
-# Error tracking and application monitoring [https://www.honeybadger.io]
-gem "honeybadger"
+# Error tracking and performance monitoring [https://sentry.io]
+gem "sentry-ruby"
+gem "sentry-rails"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
