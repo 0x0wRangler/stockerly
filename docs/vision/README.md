@@ -1,77 +1,77 @@
 # Stockerly — Vision
 
-> Última actualización: **2026-05-14** (Sprint 1 — Reset)
-> Esta carpeta es la **única fuente de verdad** sobre por qué Stockerly existe, para quién, qué hace y qué no hace.
+> Last updated: **2026-05-14** (Sprint 1 — Reset)
+> This folder is the **single source of truth** for why Stockerly exists, who it's for, what it does, and what it doesn't do.
 
 ---
 
-## El norte
+## North star
 
-> **Stockerly es la herramienta personal de Adrian para entender y operar su patrimonio invertido entre MXN y USD (mismas acciones cotizadas en USD, posiciones en MXN como CETES), con tracking multi-divisa correcto (TC histórico al momento del trade). Lo open source es portfolio público. La "lente PO" es disciplina sobre el constructor — no una audiencia.**
+> **Stockerly is Adrian's personal tool for understanding and operating his investment patrimony split between MXN and USD (same stocks quoted in USD, MXN positions like CETES), with correct multi-currency tracking (historical FX at trade execution). The open-source repo is a public portfolio. The "PO lens" is discipline on the builder — not a separate audience.**
 
-Este norte sustituye al PRD original (1.1, 2026-03-04) que describía 3 personas, 50K traders y un funnel de adquisición pública. El PRD original fue archivado en `docs/archive/spec-2026-Q1/` durante el Sprint 1.
+This north supersedes the original PRD (v1.1, 2026-03-04) which described 3 personas, 50K traders, and a public acquisition funnel. The original PRD was archived under `docs/archive/spec-2026-Q1/` during Sprint 1.
 
 ---
 
-## Audiencia
+## Audience
 
-Ver [`audience.md`](./audience.md). En resumen:
+See [`audience.md`](./audience.md). In summary:
 
-- **Primary:** Adrian (dogfood) — inversor MX con portafolio mixto MXN+USD, cadencia semanal.
-- **Secondary:** ≤20 amigos invitados (beta cerrada, sin auto-registro).
-- **Non-users:** day traders, advisors, gringo investors, contadores, OSS contribuidores (cerrado a PRs hasta v1.0).
+- **Primary:** Adrian (dogfood) — MX investor with mixed MXN+USD portfolio, weekly cadence.
+- **Secondary:** ≤20 invited friends (closed beta, no self-registration).
+- **Non-users:** day traders, advisors, gringo investors, accountants, OSS contributors (closed to PRs until v1.0).
 
 ---
 
 ## Jobs to be Done
 
-Ver [`jobs-to-be-done.md`](./jobs-to-be-done.md). 6 JTBDs definidos al 2026-05-14:
+See [`jobs-to-be-done.md`](./jobs-to-be-done.md). 6 JTBDs defined as of 2026-05-14:
 
-1. Patrimonio consolidado en MXN
-2. Drawdown de posición desde costo promedio en MXN
-3. CETE por vencer
-4. Earnings de holdings
-5. Trade capture en menos de 30 segundos
-6. Posición en zona técnica notable (descriptivo, no prescriptivo)
-
----
-
-## Lo que NO somos
-
-Ver [`non-goals.md`](./non-goals.md). Lista consolidada de audiencia, funcionalidad, lenguaje, producto y mercado fuera de scope.
+1. Consolidated patrimony in MXN
+2. Position drawdown from average cost in MXN
+3. CETE about to mature
+4. Earnings on held assets
+5. Trade capture in under 30 seconds
+6. Position in notable technical zone (descriptive, not prescriptive)
 
 ---
 
-## Tres reglas duras (no negociables)
+## What we are NOT
 
-1. **Multi-currency MXN/USD es ciudadano de primera clase**, no "feature internacional". Sin esto, los JTBDs mienten.
-2. **Cuando Adrian-usuario y Adrian-PO chocan, gana usuario.** El PO observa y aprende; no impone features que no le sirven al usuario real.
-3. **Toda feature nueva pasa el filtro de 4:** trigger personal documentado + JTBD + métrica de uso + Definition of Done. Sin los 4, no se construye.
+See [`non-goals.md`](./non-goals.md). Consolidated list of audience, functionality, language, product and market boundaries that are explicitly out of scope.
 
 ---
 
-## Lenguaje del producto
+## Three hard rules (non-negotiable)
 
-Stockerly habla en **lenguaje descriptivo, nunca prescriptivo**. Indicadores técnicos interpretados ("AAPL aparece oversold según RSI(14)") están permitidos. Verbos de acción dirigidos al usuario ("compra AAPL") están prohibidos.
-
-Decisión completa, ejemplos, zona gris y plan de implementación: ver [`../architecture/adr/0001-descriptive-not-prescriptive-language.md`](../architecture/adr/0001-descriptive-not-prescriptive-language.md).
-
----
-
-## Cómo cambia este norte
-
-- Edits a `README.md`, `audience.md`, `non-goals.md`, `jobs-to-be-done.md` requieren commit con razón en el mensaje.
-- Cambios estructurales (audiencia, scope, lenguaje del producto) requieren **nueva ADR** referenciando el cambio.
-- **Audit trimestral:** una de las preguntas de retro de sprint trimestral es *"¿el norte sigue siendo verdad?"*. Si no, escribir ADR.
-- Mientras Stockerly siga siendo beta personal/amigos: el norte se mantiene firme. Si transiciona a monetizado/comercial: revisar todo.
+1. **Multi-currency MXN/USD is a first-class citizen**, not an "international feature". Without this, the JTBDs lie.
+2. **When Adrian-as-user and Adrian-as-PO clash, the user wins.** The PO observes and learns; never imposes features that don't serve the real user.
+3. **Every new feature passes the 4-filter:** documented personal trigger + JTBD + usage metric + Definition of Done. Without all 4, it doesn't get built.
 
 ---
 
-## Documentos hermanos
+## Product language
 
-| Doc | Propósito |
+Stockerly speaks in **descriptive language, never prescriptively**. Interpreted technical indicators (*"AAPL appears oversold per RSI(14)"*) are allowed. Action verbs directed at the user (*"buy AAPL"*) are forbidden.
+
+Full decision, examples, gray zone, and implementation plan: [`../architecture/adr/0001-descriptive-not-prescriptive-language.md`](../architecture/adr/0001-descriptive-not-prescriptive-language.md).
+
+---
+
+## How this north changes
+
+- Edits to `README.md`, `audience.md`, `non-goals.md`, `jobs-to-be-done.md` require a commit message with reason.
+- Structural changes (audience, scope, product language) require a **new ADR** referencing the change.
+- **Quarterly audit:** one of the sprint retro questions every quarter is *"Is the north still true?"*. If not, write an ADR.
+- While Stockerly remains personal/friends beta: the north stays firm. If it transitions to monetized/commercial: revisit everything.
+
+---
+
+## Sibling documents
+
+| Doc | Purpose |
 |---|---|
-| [`audience.md`](./audience.md) | Quién es el usuario primario, secundarios beta, non-users, cupo |
-| [`non-goals.md`](./non-goals.md) | Lo que explícitamente NO somos (audiencia, scope, mercado) |
-| [`jobs-to-be-done.md`](./jobs-to-be-done.md) | Los 6 JTBDs expandidos con datos, vistas, triggers, métricas |
-| [`../architecture/adr/`](../architecture/adr/) | Decisiones de arquitectura inmutables (ADR-001 es el primero) |
+| [`audience.md`](./audience.md) | Primary user, beta secondaries, non-users, cap size |
+| [`non-goals.md`](./non-goals.md) | What we explicitly are NOT (audience, scope, market) |
+| [`jobs-to-be-done.md`](./jobs-to-be-done.md) | The 6 JTBDs expanded with data, surfaces, triggers, metrics |
+| [`../architecture/adr/`](../architecture/adr/) | Immutable architecture decisions (ADR-001 is the first) |

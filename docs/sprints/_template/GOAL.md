@@ -1,30 +1,30 @@
 # Sprint Goal
 
-> Una sola frase. No negociable durante el sprint.
-> Si el goal necesita ser revisado mid-sprint, cierra este sprint anticipadamente con retro y abre uno nuevo.
+> A single sentence. Non-negotiable during the sprint.
+> If the goal needs to be revised mid-sprint, close this sprint early with retro and open a new one.
 
-**Goal:** <!-- Una frase. Ej: "Multi-currency MXN/USD foundational + landing público no miente." -->
+**Goal:** <!-- One sentence. e.g.: "Multi-currency MXN/USD foundational + public landing doesn't lie." -->
 
-**Sprint period:** <!-- 1-2 semanas. Ej: 2026-05-15 → 2026-05-29 -->
+**Sprint period:** <!-- 1-2 weeks. e.g.: 2026-05-15 → 2026-05-29 -->
 
-**Sprint number / milestone:** <!-- Ej: S02 — 2026-S02-truth-foundation -->
+**Sprint number / milestone:** <!-- e.g.: S02 — 2026-S02-truth-foundation -->
 
 ---
 
-## Por qué este goal y no otro
+## Why this goal and not another
 
 <!--
-1-3 párrafos. Qué problema concreto resuelve este sprint. Qué se desbloquea al cerrarlo.
-Si el goal apunta a un JTBD específico, referenciarlo (docs/vision/jobs-to-be-done.md#jtbd-N).
-Si apunta a una decisión arquitectural, referenciar el ADR.
+1-3 paragraphs. What specific problem does this sprint solve. What gets unblocked when it closes.
+If the goal targets a specific JTBD, reference it (docs/vision/jobs-to-be-done.md#jtbd-N).
+If it targets an architectural decision, reference the ADR.
 -->
 
 ---
 
-## Lo que NO está en este sprint (anti-scope)
+## What's NOT in this sprint (anti-scope)
 
 <!--
-Lista breve de cosas que se podrían haber metido y conscientemente quedaron fuera. Esto previene scope creep.
+Brief list of things that could have been included and were consciously left out. This prevents scope creep.
 -->
 
 - ...

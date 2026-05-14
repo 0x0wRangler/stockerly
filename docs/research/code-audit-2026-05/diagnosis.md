@@ -1,200 +1,200 @@
-# Code Audit — Diagnóstico Categorizado
+# Code Audit — Categorized Diagnosis
 
-> **Fecha:** 2026-05-14
-> **Fuente:** Síntesis de 4 sub-agents (Hiroto/Lucía/Renata/Esther) más cross-check con paths y líneas.
-> **Companion:** [`inventory.md`](./inventory.md) tiene los números crudos. Este archivo categoriza los hallazgos por gravedad.
-
----
-
-## 🔴 P0 — Beta-blockers
-
-Bloquean honestamente invitar al primer amigo.
-
-### P0.1 — Multi-currency estructural (no son 2 líneas)
-
-El P0 conocido (`currency: "USD"` hardcoded en `execute_trade.rb:39,60`) es solo la punta del iceberg. **Todo el núcleo aritmético del portafolio asume single-currency USD.**
-
-**Sitios afectados:**
-
-- `app/contexts/trading/use_cases/execute_trade.rb:39,60` — hardcode `currency: "USD"` en dos `create!`.
-- `app/contexts/trading/contracts/execute_trade_contract.rb:1-26` — el contract **no acepta `currency` ni `fx_rate_at_execution`** como input. Adrian literalmente no puede registrar un trade en MXN aunque quisiera.
-- `app/models/position.rb:11-12` — `scope :domestic, -> { where(currency: "USD") }` y `:international` para `!= USD`. **Mentalidad USA-centric hardcoded en el modelo** (Adrian está en México: doméstico para él = MXN).
-- `db/schema.rb` — defaults `"USD"` en `positions.currency`, `trades.currency`, `dividends.currency`, `financial_statements.currency`, `users.preferred_currency`. El default arrastra USD a todos los nuevos registros.
-- **`Asset` NO tiene columna `currency`** — la moneda nativa del instrumento es implícita (sin source of truth). CETES es MXN por convención del símbolo `CETES_*D`; AAPL es USD por suposición.
-- **No existe `Trade.fx_rate_at_execution`, `Position.cost_basis_mxn`, ni `Position.cost_basis_usd`**. Cuando Adrian compra AAPL via broker MX en MXN, no hay forma de capturar el TC del día.
-- `db/schema.rb` `portfolio_snapshots.total_value` e `invested_value` son `decimal` sin columna `currency` — si mañana se cambia el reporte a MXN, los snapshots históricos quedan ambiguos.
-
-**Infra ociosa:** existe `app/models/fx_rate.rb` con `FxRate.convert` y `FxRatesGateway`, pero `FxRate.convert` **jamás se invoca desde código de dominio**. Hay datos y no hay wiring.
-
-**Mapping a JTBDs:** bloquea #1 (Patrimonio consolidado MXN) y #2 (Drawdown desde costo MXN), debilita #5 (Trade capture — no se puede capturar correctamente).
+> **Date:** 2026-05-14
+> **Source:** Synthesis of 4 sub-agents (Hiroto/Lucía/Renata/Esther) plus cross-check with paths and lines.
+> **Companion:** [`inventory.md`](./inventory.md) has the raw numbers. This file categorizes the findings by severity.
 
 ---
 
-### P0.2 — Calculadores currency-naive
+## 🔴 P0 — Beta blockers
 
-8 calculadores **mienten matemáticamente** para portafolio mixto MXN+USD:
+They block honestly inviting the first friend.
 
-| Archivo | Pecado | Consecuencia |
+### P0.1 — Multi-currency structural (not 2 lines)
+
+The known P0 (`currency: "USD"` hardcoded in `execute_trade.rb:39,60`) is only the tip of the iceberg. **The entire arithmetic core of the portfolio assumes single-currency USD.**
+
+**Affected sites:**
+
+- `app/contexts/trading/use_cases/execute_trade.rb:39,60` — hardcoded `currency: "USD"` in two `create!` calls.
+- `app/contexts/trading/contracts/execute_trade_contract.rb:1-26` — the contract **does not accept `currency` or `fx_rate_at_execution`** as input. Adrian literally cannot record a trade in MXN even if he wanted to.
+- `app/models/position.rb:11-12` — `scope :domestic, -> { where(currency: "USD") }` and `:international` for `!= USD`. **USA-centric mentality hardcoded in the model** (Adrian is in Mexico: domestic for him = MXN).
+- `db/schema.rb` — `"USD"` defaults on `positions.currency`, `trades.currency`, `dividends.currency`, `financial_statements.currency`, `users.preferred_currency`. The default drags USD into every new record.
+- **`Asset` has NO `currency` column** — the instrument's native currency is implicit (no source of truth). CETES is MXN by symbol convention `CETES_*D`; AAPL is USD by assumption.
+- **`Trade.fx_rate_at_execution`, `Position.cost_basis_mxn`, and `Position.cost_basis_usd` do not exist**. When Adrian buys AAPL via a Mexican broker in MXN, there's no way to capture that day's FX.
+- `db/schema.rb` `portfolio_snapshots.total_value` and `invested_value` are `decimal` without a `currency` column — if tomorrow the report changes to MXN, historical snapshots become ambiguous.
+
+**Idle infrastructure:** `app/models/fx_rate.rb` with `FxRate.convert` and `FxRatesGateway` exist, but `FxRate.convert` **is never invoked from domain code**. Data exists; no wiring.
+
+**Mapping to JTBDs:** blocks #1 (Consolidated patrimony MXN) and #2 (Drawdown from MXN cost), weakens #5 (Trade capture — cannot capture correctly).
+
+---
+
+### P0.2 — Currency-naive calculators
+
+8 calculators **lie mathematically** for a mixed MXN+USD portfolio:
+
+| File | Sin | Consequence |
 |---|---|---|
-| `app/models/portfolio.rb:17-19` | `total_value` suma `shares * current_price` sin conversión | Suma pesos mexicanos de CETES con dólares de NYSE como si fueran la misma moneda. **El número del dashboard es matemáticamente sin sentido.** |
-| `app/models/portfolio.rb:21-23` | `total_unrealized_gain` misma raíz | P&L global es ficción aritmética |
-| `app/models/portfolio.rb:25-37` | `allocation_by_sector`, `allocation_by_asset_type` agrupan SQL `SUM(shares * current_price)` sin FX | Pies de allocation mienten cuando hay mezcla |
-| `app/contexts/trading/domain/concentration_analyzer.rb:9-14` | HHI calculado sobre `value = shares * current_price` sin normalizar | Reporta concentración inexistente: 1M MXN en CETES (~50K USD) vs 50K USD en AAPL — HHI dice 99% en CETES porque los pesos del número son ~17x más grandes |
-| `app/contexts/trading/domain/portfolio_risk_calculator.rb:40-65` | Volatilidad, Sharpe, drawdown sobre `total_value.to_f` de snapshots | Si snapshots mezclan monedas, la volatilidad incluye **ruido del tipo de cambio**, no volatilidad del portafolio. Sharpe falsamente alto/bajo |
-| `app/contexts/trading/domain/time_weighted_return.rb:46-56` | TWR sobre `total_value` mezclado | Mismo problema. Cash flows también ignoran moneda |
-| `app/contexts/trading/domain/period_returns_calculator.rb:18,56-58` | Returns 1D/1M/YTD sobre `total_value` mezclado | Comparas pesos manzanas con manzanas-más-naranjas |
-| `app/contexts/trading/domain/upcoming_dividends_presenter.rb:31` | `expected_total = shares * amount_per_share` sin currency | Dividendo USD se muestra como número plano; si user asume MXN, error ~17x |
-| `app/contexts/trading/domain/weekly_insight_calculator.rb:33-39` | `weekly_change` sobre snapshots mezclados | "Tu portafolio subió 8%" puede ser puro movimiento cambiario |
+| `app/models/portfolio.rb:17-19` | `total_value` sums `shares * current_price` without conversion | Adds Mexican pesos of CETES with NYSE dollars as if they were the same currency. **The dashboard number is mathematically meaningless.** |
+| `app/models/portfolio.rb:21-23` | `total_unrealized_gain` same root | Global P&L is arithmetic fiction |
+| `app/models/portfolio.rb:25-37` | `allocation_by_sector`, `allocation_by_asset_type` group SQL `SUM(shares * current_price)` without FX | Allocation pies lie when mixed |
+| `app/contexts/trading/domain/concentration_analyzer.rb:9-14` | HHI computed over `value = shares * current_price` without normalization | Reports nonexistent concentration: 1M MXN in CETES (~50K USD) vs 50K USD in AAPL — HHI says 99% in CETES because the number magnitudes are ~17x bigger |
+| `app/contexts/trading/domain/portfolio_risk_calculator.rb:40-65` | Volatility, Sharpe, drawdown over `total_value.to_f` of snapshots | If snapshots mix currencies, the volatility includes **FX rate noise**, not portfolio volatility. Sharpe falsely high/low |
+| `app/contexts/trading/domain/time_weighted_return.rb:46-56` | TWR over mixed `total_value` | Same problem. Cash flows also ignore currency |
+| `app/contexts/trading/domain/period_returns_calculator.rb:18,56-58` | 1D/1M/YTD returns over mixed `total_value` | Comparing apples to apples-plus-oranges |
+| `app/contexts/trading/domain/upcoming_dividends_presenter.rb:31` | `expected_total = shares * amount_per_share` without currency | USD dividend shown as a plain number; if user assumes MXN, error ~17x |
+| `app/contexts/trading/domain/weekly_insight_calculator.rb:33-39` | `weekly_change` over mixed snapshots | "Your portfolio is up 8%" could be pure FX movement |
 
 ---
 
-### P0.3 — CETES: maturity_date sobreescrita + JTBD #3 no implementado
+### P0.3 — CETES: maturity_date overwritten + JTBD #3 not implemented
 
-**Estado actual de CETES (lo que SÍ funciona):**
-- `app/contexts/market_data/domain/yield_calculator.rb` math correcto para convención mexicana 360-day
-- `BanxicoGateway` lee las 4 series (28/91/182/364) con IDs Banxico correctos
-- `SyncCetes` upsertea asset `CETES_{term}D` con `face_value: 10.0` y `yield_rate`
+**What CETES DOES work:**
+- `app/contexts/market_data/domain/yield_calculator.rb` math correct for the Mexican 360-day convention
+- `BanxicoGateway` reads the 4 series (28/91/182/364) with correct Banxico IDs
+- `SyncCetes` upserts a `CETES_{term}D` asset with `face_value: 10.0` and `yield_rate`
 
-**Lo roto:**
-- `app/contexts/market_data/use_cases/sync_cetes.rb:40` — `maturity_date: Date.current + days.days` **se sobreescribe en cada sync**. Es un CETES "rolling" sintético, no un instrumento real con vencimiento fijo. Si Adrian compra hoy CETES 28D, su posición debería tener su propio `maturity_date` congelado, no el del asset.
-- **`Position` no tiene columna `maturity_date`** — para CETES esto es estructuralmente necesario.
-- **No existen alertas de vencimiento de CETES** (`grep` en `app/contexts/alerts` por `maturity\|cetes\|fixed_income` → 0 resultados). **JTBD #3 del PRD no está implementado.**
-- `ExecuteTradeContract` no captura `maturity_date`, plazo, ni descuento al que se compró.
-
----
-
-## 🟠 P1 — Fugas arquitecturales y BC mal delineados
-
-### Fugas cross-context confirmadas
-
-1. **`trading/use_cases/assemble_dashboard.rb:24`** → llama `MarketData::Domain::MarketSentiment.for_user(user)` (cross-context directo a domain). Además líneas 13, 15, 22, 27, 30, 44 acceden a **modelos** de MarketData (`NewsArticle`, `Asset`, `MarketIndex`, `FearGreedReading`, `PortfolioInsight`) — fuga de modelo, no solo de domain.
-2. **`market_data/use_cases/generate_portfolio_insight.rb:12`** → `Trading::Domain::ConcentrationAnalyzer.analyze`. Además línea 8 itera `portfolio.open_positions` (modelo de Trading) y línea 20 escribe `PortfolioInsight` (que el dashboard de Trading lee — bidireccional).
-3. **`alerts/handlers/create_notification_on_alert.rb:14`** → invoca `Notifications::UseCases::CreateNotification` directamente (no por event). Esto convierte a Notifications en **librería**, no en BC.
-
-### Fugas nuevas detectadas
-
-4. **`administration/use_cases/assets/search_ticker.rb:32`** → instancia `MarketData::Gateways::AlphaVantageGateway` directamente. Administration acoplada a la implementación HTTP de MarketData.
-5. **`administration/use_cases/users/suspend_user.rb:13`** (idem reactivate, delete) → Administration publica events del namespace `Identity::Events::User*`. Un BC ajeno publicando events del otro BC.
-6. **`administration/use_cases/assets/create_asset.rb:18`** (idem delete) → Administration publica `MarketData::Events::AssetCreated/AssetDeleted`. Mismo patrón.
-
-### Veredicto arquitectural
-
-- **Trading↔MarketData boundary es ficción.** Cruza en ambas direcciones. Agregar un widget al dashboard implica tocar Trading, MarketData, y a veces Alerts.
-- **Administration no es un BC real.** Publica events de Identity y MarketData, instancia gateways de MarketData. Es un *frontend admin* sobre los otros BCs. Reasignar sus use cases a los BCs dueños eliminaría ~10 fugas y un nivel de namespace.
-- **Notifications es una librería, no un BC.** Es invocada directamente. Considerar formalmente como librería compartida en `app/shared/`.
+**What's broken:**
+- `app/contexts/market_data/use_cases/sync_cetes.rb:40` — `maturity_date: Date.current + days.days` **is overwritten on every sync**. It's a synthetic "rolling CETES", not a real instrument with a fixed maturity. If Adrian buys 28D CETES today, his position should have its own `maturity_date` frozen, not the asset's.
+- **`Position` lacks `maturity_date` column** — for CETES this is structurally necessary.
+- **No CETES maturity alerts exist** (`grep` in `app/contexts/alerts` for `maturity|cetes|fixed_income` → 0 results). **JTBD #3 from the PRD is not implemented.**
+- `ExecuteTradeContract` doesn't capture `maturity_date`, term, or discount price.
 
 ---
 
-## 🟡 P2 — Features sin JTBD canónico
+## 🟠 P1 — Architectural leaks and miss-bounded contexts
 
-De las 22 fases anteriores, ~25-28% del código no mapea a ningún JTBD canónico. Lista priorizada:
+### Confirmed cross-context leaks
 
-### Top candidatos a deprecación inmediata
+1. **`trading/use_cases/assemble_dashboard.rb:24`** → calls `MarketData::Domain::MarketSentiment.for_user(user)` (direct cross-context to domain). Also lines 13, 15, 22, 27, 30, 44 access **models** of MarketData (`NewsArticle`, `Asset`, `MarketIndex`, `FearGreedReading`, `PortfolioInsight`) — model leak, not just domain leak.
+2. **`market_data/use_cases/generate_portfolio_insight.rb:12`** → `Trading::Domain::ConcentrationAnalyzer.analyze`. Also line 8 iterates `portfolio.open_positions` (Trading model) and line 20 writes `PortfolioInsight` (which Trading's dashboard reads — bidirectional).
+3. **`alerts/handlers/create_notification_on_alert.rb:14`** → directly invokes `Notifications::UseCases::CreateNotification` (not via event). This makes Notifications a **library**, not a BC.
 
-| Feature | Fase | Por qué fuera |
+### Newly detected leaks
+
+4. **`administration/use_cases/assets/search_ticker.rb:32`** → directly instantiates `MarketData::Gateways::AlphaVantageGateway`. Administration coupled to MarketData's HTTP implementation.
+5. **`administration/use_cases/users/suspend_user.rb:13`** (same for reactivate, delete) → Administration publishes events in the `Identity::Events::User*` namespace. A foreign BC publishing another BC's events.
+6. **`administration/use_cases/assets/create_asset.rb:18`** (same for delete) → Administration publishes `MarketData::Events::AssetCreated/AssetDeleted`. Same pattern.
+
+### Architectural verdict
+
+- **Trading↔MarketData boundary is fiction.** Crosses both directions. Adding a dashboard widget means touching Trading, MarketData, and sometimes Alerts.
+- **Administration isn't a real BC.** Publishes Identity and MarketData events, instantiates MarketData gateways. It's an *admin frontend* over the other BCs. Reassigning its use cases to the owning BCs would eliminate ~10 leaks and a namespace level.
+- **Notifications is a library, not a BC.** It's invoked directly. Consider formally as a shared library in `app/shared/`.
+
+---
+
+## 🟡 P2 — Features without canonical JTBD
+
+Of the previous 22 phases, ~25-28% of the code doesn't map to any canonical JTBD. Prioritized list:
+
+### Top candidates for immediate deprecation
+
+| Feature | Phase | Why out |
 |---|---|---|
-| **Capa LLM completa (Phase 22)** | 22.0-22.4 | InsightGenerator, NewsSentimentAnalyzer, FundamentalHealthCheck, EarningsNarrativeGenerator, LlmGateway, anonymizer, 4 views, contracts, ai_insights table+model. **134 specs, 12 commits.** Ningún JTBD canónico la pide. |
-| **Landing pública con "50K traders"** | PRD F-001 | Audiencia es 20 invitados. Copy es fake social proof (ver Renata) |
-| **`/trends` Trend Explorer público** | PRD F-003 | Explicitly non-user en `docs/vision/non-goals.md` |
-| **Risk Metrics + TWR benchmarking** | Phase 17, 18 | Feature de PM; weekly investor no la usa. Y TWR vs S&P miente con currency bug P0 |
-| **Concentration alerts + HHI analyzer** | Phase 21.0 | Adrian con 5-15 holdings no necesita HHI. Sin JTBD canónico. |
-| **F&G historical chart + 7 sub-indicators CNN** | Phase 9.1, 18 | F&G score básico ya está en JTBD #6 tangencial; el chart y los 7 componentes son ruido visual |
-| **Sentiment-based alerts** | Phase 13.0 | Alertear "el mercado está greedy" no encaja en JTBDs #1-6 |
-| **Onboarding wizard 3 pasos** | PRD F-017 | Los 19 amigos llegan por invitación directa, no por wizard |
+| **Entire LLM layer (Phase 22)** | 22.0-22.4 | InsightGenerator, NewsSentimentAnalyzer, FundamentalHealthCheck, EarningsNarrativeGenerator, LlmGateway, anonymizer, 4 views, contracts, ai_insights table+model. **134 specs, 12 commits.** No canonical JTBD asks for it. |
+| **Public landing with "50K traders"** | PRD F-001 | Audience is 20 invitees. Copy is fake social proof (see Renata) |
+| **`/trends` public Trend Explorer** | PRD F-003 | Explicit non-user in `docs/vision/non-goals.md` |
+| **Risk Metrics + TWR benchmarking** | Phase 17, 18 | PM feature; weekly investor doesn't use it. And TWR vs S&P lies with the P0 currency bug |
+| **Concentration alerts + HHI analyzer** | Phase 21.0 | Adrian with 5-15 holdings doesn't need HHI. No canonical JTBD. |
+| **F&G historical chart + 7 CNN sub-indicators** | Phase 9.1, 18 | Basic F&G score is already tangential to JTBD #6; the chart and the 7 components are visual noise |
+| **Sentiment-based alerts** | Phase 13.0 | Alerting "the market is greedy" doesn't fit JTBDs #1-#6 |
+| **3-step onboarding wizard** | PRD F-017 | The 19 friends arrive via direct invitation, not via wizard |
 
-### Features para "mantener pero reescribir copy" (ADR-001)
+### Features to "keep but rewrite copy" (ADR-001)
 
-| Feature | Razón |
+| Feature | Reason |
 |---|---|
-| `WeeklyInsightCalculator` + dashboard insight | Si sobrevive, validar tono estrictamente observacional |
-| TrendScore tooltip / labels "Strongest/Strong/Moderate" | Cambiar a buckets numéricos descriptivos |
-| F&G card básica | Quitar lenguaje accionable, mantener score como observable |
+| `WeeklyInsightCalculator` + dashboard insight | If it survives, validate strictly observational tone |
+| TrendScore tooltip / labels "Strongest/Strong/Moderate" | Change to descriptive numeric buckets |
+| Basic F&G card | Remove action-oriented language, keep score as observable |
 
 ---
 
-## 🟡 P2 — ADR-001 violations en frontend
+## 🟡 P2 — ADR-001 violations in frontend
 
-Renata identificó que el **backend Phase 22 sí cumple ADR-001 (system prompts con guardrails)** pero el **frontend marketing copy lo viola**.
+Renata identified that the **Phase 22 backend complies with ADR-001 (system prompts with guardrails)** but the **frontend marketing copy violates it**.
 
-### Top violations en views
+### Top violations in views
 
-| # | path:line | Texto | Clasificación |
+| # | path:line | Text | Classification |
 |---|---|---|---|
-| 1 | `pages/landing.html.erb:19` | "Leverage advanced algorithms and proprietary AI indicators to **identify emerging opportunities before the crowd**" | Prescriptivo claro |
-| 2 | `pages/landing.html.erb:116` | "**Identify high-probability setups** with our proprietary AI indicators" | Prescriptivo + predicción probabilística (doblemente prohibido) |
-| 3 | `pages/landing.html.erb:161` | "**Gain a competitive edge**" | Prescriptivo |
-| 4 | `registrations/new.html.erb:12` | "Join thousands of traders using data-driven insights to **make smarter investment decisions**" | Prescriptivo |
-| 5 | `sessions/new.html.erb:24` | Fake testimonial "...Highly recommended" | Prescriptivo + fake |
-| 6 | `pages/landing.html.erb:83-100` | "Trusted by GlobalBank/DataCore/FinStream/PrimeInvest" | **Fraude soft** — clientes inventados |
-| 7 | `pages/landing.html.erb:134-148` | "$4.2B Assets Tracked", "50K+ Active Traders", "99.9% Uptime" | **Fraude soft** — claims sin respaldo (beta ≤20) |
-| 8 | `market/_listings_table.html.erb:14, 25-30` | Label "**Trend Strength: Parabolic / Strong / Weak**" | Zona gris → prescriptivo (funciona como señal de compra implícita) |
-| 9 | `market/_analyst_target.html.erb:33` | "**Upside / Downside +X%**" | Zona gris (vocabulario direccional) |
-| 10 | `news_sentiment_analyzer.rb:13` + `_news_card.html.erb:10-11` | Drift vocabulario: prompt emite "bullish/bearish/neutral", view acepta "bullish/bearish/positive/negative" | Inconsistencia tipos + ADR-001 zona gris |
+| 1 | `pages/landing.html.erb:19` | "Leverage advanced algorithms and proprietary AI indicators to **identify emerging opportunities before the crowd**" | Clear prescriptive |
+| 2 | `pages/landing.html.erb:116` | "**Identify high-probability setups** with our proprietary AI indicators" | Prescriptive + probabilistic prediction (doubly forbidden) |
+| 3 | `pages/landing.html.erb:161` | "**Gain a competitive edge**" | Prescriptive |
+| 4 | `registrations/new.html.erb:12` | "Join thousands of traders using data-driven insights to **make smarter investment decisions**" | Prescriptive |
+| 5 | `sessions/new.html.erb:24` | Fake testimonial "...Highly recommended" | Prescriptive + fake |
+| 6 | `pages/landing.html.erb:83-100` | "Trusted by GlobalBank/DataCore/FinStream/PrimeInvest" | **Soft fraud** — invented clients |
+| 7 | `pages/landing.html.erb:134-148` | "$4.2B Assets Tracked", "50K+ Active Traders", "99.9% Uptime" | **Soft fraud** — unsupported claims (beta ≤20) |
+| 8 | `market/_listings_table.html.erb:14, 25-30` | Label "**Trend Strength: Parabolic / Strong / Weak**" | Gray zone → prescriptive (functions as implicit buy signal) |
+| 9 | `market/_analyst_target.html.erb:33` | "**Upside / Downside +X%**" | Gray zone (directional vocabulary) |
+| 10 | `news_sentiment_analyzer.rb:13` + `_news_card.html.erb:10-11` | Vocabulary drift: prompt emits "bullish/bearish/neutral", view accepts "bullish/bearish/positive/negative" | Type inconsistency + ADR-001 gray zone |
 
-**Hallazgo positivo:** no se encontró ningún "compra/vende/recomendamos" literal en views. El daño está en el marketing copy del landing y en labels prescriptivos sutiles.
+**Positive finding:** no literal "buy/sell/recommend" was found in views. The damage is in the landing marketing copy and in subtle prescriptive labels.
 
-### LLM output validation faltante
+### Missing LLM output validation
 
-ADR-001 implementación dice "Añadir validación de output contra lista negra de verbos de acción". Solo se valida estructura JSON. **El guardrail del system prompt es esperanza, no garantía.**
+ADR-001 implementation says "Add output validation against an action-verb blacklist". Only JSON structure is validated. **The system-prompt guardrail is hope, not guarantee.**
 
-Si la capa LLM sobrevive al cleanup (acción P1.4), agregar validator. Si la capa LLM se deprecia, este item desaparece.
+If the LLM layer survives the cleanup (action P1.4), add the validator. If the LLM layer is deprecated, this item disappears.
 
 ---
 
 ## 🟡 P2 — Design system drift
 
-- **Design system existe en `tailwind/application.css` pero las views lo ignoran.** 0 uso de `bg-success/error/warning/info`. 189 instancias hardcoded de `text-emerald/rose/amber/violet`. 884 instancias de `text-slate-*` (saturación monocromática).
-- **Plus Jakarta Sans cargado en `application.html.erb:34` pero nunca aplicado via clase** — la app se renderiza con CSS default font-stack, no con el branding.
-- **Componentes duplicados:** `_stat_card.html.erb` vs `_admin_kpi_card.html.erb` — lógica casi idéntica, deberían unificarse con variant prop.
-- **`_flash_message.html.erb`** usa `bg-green-50/bg-red-50` directos en vez de tokens `success/error` del `@theme`.
-- **`_trade_row.html.erb`** vs **`_edit_row.html.erb`** repiten estructura; `_edit_row` sin dark mode classes (inconsistente).
-- **F&G cards** repiten hex hardcoded de buckets de color 2 veces (`#ef4444/#f97316/#f59e0b/#84cc16/#22c55e`) en lugar de tokens.
+- **Design system exists in `tailwind/application.css` but views ignore it.** 0 use of `bg-success/error/warning/info`. 189 hardcoded instances of `text-emerald/rose/amber/violet`. 884 instances of `text-slate-*` (monochromatic saturation).
+- **Plus Jakarta Sans loaded in `application.html.erb:34` but never applied via class** — the app renders with the default CSS font-stack, not the brand.
+- **Duplicate components:** `_stat_card.html.erb` vs `_admin_kpi_card.html.erb` — almost identical logic, should be unified with a variant prop.
+- **`_flash_message.html.erb`** uses `bg-green-50/bg-red-50` directly instead of `success/error` tokens from `@theme`.
+- **`_trade_row.html.erb`** vs **`_edit_row.html.erb`** repeat structure; `_edit_row` lacks dark mode classes (inconsistent).
+- **F&G cards** repeat hardcoded color-bucket hex twice (`#ef4444/#f97316/#f59e0b/#84cc16/#22c55e`) instead of using tokens.
 
 ---
 
-## 🟡 P2 — Anti-patterns en código
+## 🟡 P2 — Code anti-patterns
 
-### Use cases triviales sobre andamiaje (10+)
+### Trivial use cases over scaffolding (10+)
 
-Lista completa en [`inventory.md`](./inventory.md#use-cases-triviales-anti-pattern-3--top-10). Todos: 13-19 líneas de `ApplicationUseCase` + `Success/Failure` para `update!` o `destroy!`. Podrían ser scope/método de modelo o llamada directa desde controller con 80% menos código.
+Full list in [`inventory.md`](./inventory.md#trivial-use-cases-anti-pattern-3--top-10). All: 13-19 lines of `ApplicationUseCase` + `Success/Failure` for `update!` or `destroy!`. Could be a model scope/method or a direct call from the controller with 80% less code.
 
-**Propuesta:** introducir `SimpleUseCase` (sin dry-monads) para CRUD trivial. O eliminar UC y llamar desde controller.
+**Proposal:** introduce `SimpleUseCase` (without dry-monads) for trivial CRUD. Or eliminate UC and call from controller.
 
-### 11 events zombie + 4 fantasma
+### 11 zombie + 4 ghost events
 
-Ver [`inventory.md`](./inventory.md#event-subscriptions--health-check). Limpieza: borrar los 4 fantasma (Trading::Events::WatchlistItemAdded/PositionOpened/PositionClosed/PortfolioSnapshotTaken + Alerts::Events::AlertRuleCreated); decidir si los publicados-sin-subscriber son audit-only o muertos.
+See [`inventory.md`](./inventory.md#event-subscriptions--health-check). Cleanup: delete the 4 ghosts (Trading::Events::WatchlistItemAdded/PositionOpened/PositionClosed/PortfolioSnapshotTaken + Alerts::Events::AlertRuleCreated); decide whether the published-without-subscribers are audit-only or dead.
 
-### Designs abandonados sin SPEC.md
+### Abandoned designs without SPEC.md
 
-4 carpetas en `designs/` que no siguieron el workflow `PROCESSING.md`:
-- `aapl_statements_tab_-_stockerly/` — implementado, cerrar
-- `detalle_de_asset_-_aapl/` — implementado parcial, cerrar (divergió)
-- `stockerly_-_adaptive_metrics/` — no implementado, decidir
-- `stockerly_-_tooltip_component_detail/` — no implementado, candidato a retomar
-
----
-
-## 🟢 Lo que está bien (no tocar)
-
-- **Arquitectura DDD core** — 6 BCs declarados; fugas son puntuales y atacables, no caos sistémico
-- **LLM system prompts** (si sobreviven el cleanup) — los 4 generators de Phase 22 tienen guardrail explícito **"Never recommend buying, selling, or any specific action"**. Mejor que el promedio de la industria.
-- **CETES yield math** — `YieldCalculator` correcto para convención mexicana 360-day
-- **Empty states + skeleton components** — bien diseñados, buena cobertura en listings
-- **Components shared** — `_asset_badge`, `_sparkline`, `_donut_chart`, `_empty_state`, `_skeleton` bien factorizados con headers `<%# Usage: ... %>`
-- **Auth con `has_secure_password` + sessions** — Rails native, sin Devise
-- **CI pipeline limpio** — brakeman, bundler-audit, importmap audit
-- **Disclaimer regulatorio** — `market/_disclaimer.html.erb`, `legal/risk_disclosure.html.erb` cumplen función
-- **AuthenticatedController + Admin::BaseController hierarchy** — clara
+4 folders in `designs/` that didn't follow the `PROCESSING.md` workflow:
+- `aapl_statements_tab_-_stockerly/` — implemented, close
+- `detalle_de_asset_-_aapl/` — partially implemented, close (diverged)
+- `stockerly_-_adaptive_metrics/` — not implemented, decide
+- `stockerly_-_tooltip_component_detail/` — not implemented, candidate to resume
 
 ---
 
-## ADRs candidatos a escribir
+## 🟢 What's good (don't touch)
 
-De los hallazgos arquitecturales, ADRs pendientes (no urgentes, escribir cuando se resuelva el problema correspondiente):
+- **DDD core architecture** — 6 BCs declared; leaks are localized and tractable, not systemic chaos
+- **LLM system prompts** (if they survive cleanup) — the 4 Phase 22 generators have explicit guardrail **"Never recommend buying, selling, or any specific action"**. Better than industry average.
+- **CETES yield math** — `YieldCalculator` correct for the Mexican 360-day convention
+- **Empty states + skeleton components** — well designed, good coverage in listings
+- **Shared components** — `_asset_badge`, `_sparkline`, `_donut_chart`, `_empty_state`, `_skeleton` well factored with `<%# Usage: ... %>` headers
+- **Auth with `has_secure_password` + sessions** — Rails native, no Devise
+- **Clean CI pipeline** — brakeman, bundler-audit, importmap audit
+- **Regulatory disclaimer** — `market/_disclaimer.html.erb`, `legal/risk_disclosure.html.erb` serve their function
+- **AuthenticatedController + Admin::BaseController hierarchy** — clear
 
-1. **ADR-002** — Trading + MarketData boundary (cómo resolver la fuga en `assemble_dashboard`)
+---
+
+## ADRs to write
+
+From the architectural findings, ADRs pending (not urgent, write when addressing the corresponding problem):
+
+1. **ADR-002** — Trading + MarketData boundary (how to resolve the `assemble_dashboard` leak)
 2. **ADR-003** — Sync vs async event handler criterion
-3. **ADR-004** — Notifications: ¿BC propio o librería compartida?
-4. **ADR-005** — Ownership de events cross-BC (¿quién publica `Identity::Events::UserSuspended`?)
-5. **ADR-006** — Cuándo NO usar ApplicationUseCase (criterio para SimpleUseCase o controller-direct)
-6. **ADR-007** — Administration: ¿BC propio o admin layer transversal?
+3. **ADR-004** — Notifications: own BC or shared library?
+4. **ADR-005** — Cross-BC event ownership (who publishes `Identity::Events::UserSuspended`?)
+5. **ADR-006** — When NOT to use ApplicationUseCase (criterion for SimpleUseCase or controller-direct)
+6. **ADR-007** — Administration: own BC or cross-cutting admin layer?

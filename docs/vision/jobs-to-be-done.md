@@ -1,200 +1,200 @@
 # Jobs to be Done — Stockerly
 
-> Los 6 JTBDs que justifican la existencia de Stockerly al 2026-05-14.
-> Cada JTBD aquí es la **expansión** de las líneas que aparecen en [`audience.md`](./audience.md).
-> Una feature nueva en backlog tiene que mapearse a uno de estos (o proponer un nuevo JTBD vía edit a este archivo).
+> The 6 JTBDs that justify Stockerly's existence as of 2026-05-14.
+> Each JTBD here is the **expansion** of the lines that appear in [`audience.md`](./audience.md).
+> A new feature in the backlog must map to one of these (or propose a new JTBD via an edit to this file).
 
 ---
 
-## Estructura de cada JTBD
+## Structure of each JTBD
 
 ```
-**Statement** — la frase canónica "Cuando X, quiero Y, para Z"
-**Datos necesarios** — qué tiene que existir en BD/gateways
-**Surface en la app** — dónde lo ve el usuario
-**Triggers** — qué dispara el surfacing proactivo (si aplica)
-**Métrica de uso** — cómo sabremos si el JTBD se cumple
-**Bloqueado por** — deuda actual que impide cumplirlo
-**Status actual** — qué tan cerca está hoy de cumplirse
+**Statement** — the canonical phrase "When X, I want Y, so that Z"
+**Required data** — what must exist in DB/gateways
+**App surface** — where the user sees it
+**Triggers** — what proactively surfaces it (if applicable)
+**Usage metric** — how we'll know the JTBD is fulfilled
+**Blocked by** — current debt that prevents fulfillment
+**Current status** — how close it is today
 ```
 
 ---
 
-## JTBD #1 — Patrimonio consolidado en MXN
+## JTBD #1 — Consolidated patrimony in MXN
 
-**Statement:** *Cuando reviso mi portafolio el fin de semana, quiero ver mi patrimonio total consolidado en MXN, para saber si subí o bajé desde la última vez.*
+**Statement:** *When I review my portfolio over the weekend, I want to see my total patrimony consolidated in MXN, so I can know whether I'm up or down since last time.*
 
-**Datos necesarios:**
-- Posiciones actuales (`positions` table)
-- Precios actuales (gateways: Polygon equities, CoinGecko crypto, Banxico CETES)
-- TC USD→MXN actual (FxRatesGateway o Banxico)
-- TC USD→MXN al momento de cada compra (**bloqueador**: no existe hoy)
-- Snapshots históricos (`portfolio_snapshots`) para comparación cronológica
+**Required data:**
+- Current positions (`positions` table)
+- Current prices (gateways: Polygon equities, CoinGecko crypto, Banxico CETES)
+- Current USD→MXN FX rate (FxRatesGateway or Banxico)
+- USD→MXN FX rate at the moment of each purchase (**blocker**: doesn't exist today)
+- Historical snapshots (`portfolio_snapshots`) for chronological comparison
 
-**Surface en la app:**
-- Dashboard principal — KPI "Patrimonio Total" en MXN (con conversión visible USD→MXN)
-- Portfolio page — totales consolidados arriba
+**App surface:**
+- Main dashboard — "Total Patrimony" KPI in MXN (with visible USD→MXN conversion)
+- Portfolio page — consolidated totals at the top
 
-**Triggers:** ninguno. Es dato siempre visible al abrir la app.
+**Triggers:** none. It's data always visible when opening the app.
 
-**Métrica de uso:** Adrian abre el dashboard ≥1 vez por semana en fin de semana. Si baja a <1/mes, el JTBD no se está cumpliendo.
+**Usage metric:** Adrian opens the dashboard ≥1 time per week on weekends. If it drops below 1/month, the JTBD is not being fulfilled.
 
-**Bloqueado por:** `currency: "USD"` hardcoded en `app/contexts/trading/use_cases/execute_trade.rb:39,60`. Hasta que esto se resuelva, el patrimonio consolidado en MXN es ficción. **P0 absoluto.**
+**Blocked by:** `currency: "USD"` hardcoded in `app/contexts/trading/use_cases/execute_trade.rb:39,60`. Until this is resolved, consolidated patrimony in MXN is fiction. **Absolute P0.**
 
-**Status actual:** Implementado UI; matemática rota por el bug P0. No se puede invitar amigos beta hasta que se arregle.
-
----
-
-## JTBD #2 — Drawdown de posición desde costo promedio MXN
-
-**Statement:** *Cuando mi posición baja X% desde costo promedio (en MXN), quiero saberlo, para decidir promediar o salir.*
-
-**Datos necesarios:**
-- `position.avg_cost` en moneda nativa de adquisición
-- `position.cost_basis_mxn` calculado con TC histórico (**bloqueador**: no existe)
-- Precio actual (USD para acciones, MXN para CETES)
-- TC actual
-- Umbral X (configurable por usuario; default sugerido: -10% para warn, -15% para alert)
-
-**Surface en la app:**
-- Portfolio page — badge en cada posición que cruzó el umbral
-- Dashboard — sección "Observaciones notables" si hay posiciones bajo umbral
-- Alerts — notificación in-app cuando una posición cruza el umbral por primera vez (cooldown obligatorio)
-
-**Triggers:** EOD job revisa todas las posiciones, dispara alert cuando una cruza el umbral hacia abajo (no spam si ya está debajo).
-
-**Métrica de uso:** Adrian abre la alert/badge dentro de las 24h de generarse (proxy: click event). Si las ignora consistentemente, el JTBD no funciona.
-
-**Bloqueado por:** Mismo P0 del JTBD #1. Sin cost basis en MXN correcto, el porcentaje calculado miente.
-
-**Status actual:** AlertRule existe con `price_below_pct` cerca; falta variante de "X% desde cost basis MXN" y necesita el fix de currency.
+**Current status:** UI implemented; math broken by the P0 bug. Friends cannot be invited to beta until this is fixed.
 
 ---
 
-## JTBD #3 — CETE por vencer
+## JTBD #2 — Position drawdown from average cost in MXN
 
-**Statement:** *Cuando un CETE está por vencer, quiero saberlo con 7 días de anticipación, para decidir reinvertir.*
+**Statement:** *When my position drops X% from average cost (in MXN), I want to know, so I can decide whether to average down or exit.*
 
-**Datos necesarios:**
-- `asset.maturity_date` para asset_type CETE
-- Posiciones activas en assets tipo CETE
-- Calendario (días laborales Banxico para precisión)
+**Required data:**
+- `position.avg_cost` in the currency of acquisition
+- `position.cost_basis_mxn` computed with historical FX (**blocker**: doesn't exist)
+- Current price (USD for equities, MXN for CETES)
+- Current FX rate
+- Threshold X (user-configurable; suggested default: -10% for warning, -15% for alert)
 
-**Surface en la app:**
-- Dashboard sidebar — "Próximos eventos" listando CETES próximos a vencer
-- Asset detail de cada CETE — countdown visible
-- Alerts — notificación a 7d, 3d, 1d antes
+**App surface:**
+- Portfolio page — badge on each position that crossed the threshold
+- Dashboard — "Notable observations" section if there are positions below threshold
+- Alerts — in-app notification when a position first crosses the threshold (mandatory cooldown)
 
-**Triggers:** Daily cron job; check posiciones contra maturity_date.
+**Triggers:** EOD job reviews all positions, fires alert when one crosses the threshold downward (no spam if already below).
 
-**Métrica de uso:** Adrian reinvierte (o decide no hacerlo) dentro de las 48h después del vencimiento. Proxy: nueva trade o explicit dismiss del alert.
+**Usage metric:** Adrian opens the alert/badge within 24h of generation (proxy: click event). If he consistently ignores them, the JTBD isn't working.
 
-**Bloqueado por:** nada bloquea. CETES están modelados desde Phase 13.1 con `YieldCalculator` mexicano.
+**Blocked by:** same P0 as JTBD #1. Without correct cost basis in MXN, the computed percentage lies.
 
-**Status actual:** Listing de CETES existe, alerts de vencimiento parcialmente implementadas. Verificar en code audit (Paso 6) qué falta.
-
----
-
-## JTBD #4 — Earnings de holdings
-
-**Statement:** *Cuando entra earnings de algo que tengo, quiero saberlo con 2 días de anticipación, para no enterarme después.*
-
-**Datos necesarios:**
-- Earnings calendar (Polygon gateway, existe)
-- Holdings actuales del usuario (positions activas)
-- Match entre tickers de holdings y tickers en earnings calendar
-
-**Surface en la app:**
-- Dashboard "Próximos eventos" — earnings de holdings con BMO/AMC + EPS estimate
-- Earnings page filtrada por mis holdings
-- Notification — 2d, 1d antes (con detalles)
-
-**Triggers:** `NotifyEarningsJob` daily, 7am. Match holdings vs upcoming earnings, deduplicado con `last_triggered_at` por evento.
-
-**Métrica de uso:** Adrian abre el asset detail del ticker que tiene earnings antes del evento. Proxy: page view del asset entre alert y earning.
-
-**Bloqueado por:** nada bloquea. Implementado desde Phase 14.4 (`Earnings::NotifyApproaching`).
-
-**Status actual:** Funcional. Validar en code audit que el copy del notification no caiga en prescriptivo.
+**Current status:** AlertRule exists with `price_below_pct` nearby; needs an "X% from MXN cost basis" variant and the currency fix.
 
 ---
 
-## JTBD #5 — Trade capture rápido
+## JTBD #3 — CETE about to mature
 
-**Statement:** *Cuando agrego un trade nuevo, quiero capturarlo en menos de 30 segundos, para no abandonar el registro por flojera.*
+**Statement:** *When a CETE is about to mature, I want to know with 7 days of lead time, so I can decide whether to reinvest.*
 
-**Datos necesarios para el form:**
-- Ticker (con autocomplete contra `assets`)
+**Required data:**
+- `asset.maturity_date` for asset_type CETE
+- Active positions in CETE-type assets
+- Calendar (Banxico business days for accuracy)
+
+**App surface:**
+- Dashboard sidebar — "Upcoming events" listing CETES near maturity
+- Asset detail of each CETE — visible countdown
+- Alerts — notification at 7d, 3d, 1d before
+
+**Triggers:** Daily cron job; check positions against maturity_date.
+
+**Usage metric:** Adrian reinvests (or explicitly chooses not to) within 48h after maturity. Proxy: new trade or explicit alert dismissal.
+
+**Blocked by:** nothing structural blocks. CETES have been modeled since Phase 13.1 with the Mexican `YieldCalculator`.
+
+**Current status:** CETES listing exists, maturity alerts partially implemented. Verify in the code audit (Step 6) what's missing.
+
+---
+
+## JTBD #4 — Earnings on held assets
+
+**Statement:** *When an earnings event is coming for something I hold, I want to know 2 days ahead, so I don't find out after the fact.*
+
+**Required data:**
+- Earnings calendar (Polygon gateway, exists)
+- User's current holdings (active positions)
+- Match between holding tickers and tickers in earnings calendar
+
+**App surface:**
+- Dashboard "Upcoming events" — earnings on holdings with BMO/AMC + EPS estimate
+- Earnings page filtered by my holdings
+- Notification — 2d, 1d before (with details)
+
+**Triggers:** `NotifyEarningsJob` daily, 7am. Matches holdings vs upcoming earnings, deduplicated with `last_triggered_at` per event.
+
+**Usage metric:** Adrian opens the asset detail of the ticker with upcoming earnings before the event. Proxy: page view of the asset between alert and earnings.
+
+**Blocked by:** nothing. Implemented since Phase 14.4 (`Earnings::NotifyApproaching`).
+
+**Current status:** Working. Validate in the audit that the notification copy doesn't lapse into prescriptive language.
+
+---
+
+## JTBD #5 — Fast trade capture
+
+**Statement:** *When I add a new trade, I want to capture it in under 30 seconds, so I don't abandon the recording out of laziness.*
+
+**Required form data:**
+- Ticker (with autocomplete against `assets`)
 - Shares
-- Price (en moneda nativa)
-- **Currency (auto-detectar del asset)** — hoy hardcoded a USD ❌
-- Date (default: hoy; max: hoy; min: ¿1 año atrás?)
-- TC al momento del trade (**falta**: capturar automático desde Banxico si currency = USD)
-- Notes opcional, labels opcional
+- Price (in native currency)
+- **Currency (auto-detected from the asset)** — today hardcoded to USD ❌
+- Date (default: today; max: today; min: ¿1 year back?)
+- FX rate at the time of the trade (**missing**: auto-capture from Banxico if currency = USD)
+- Optional notes, optional labels
 
-**Surface en la app:**
-- Portfolio page — botón "+ Add Trade" abre form inline (Turbo Frame)
+**App surface:**
+- Portfolio page — "+ Add Trade" button opens inline form (Turbo Frame)
 - Dashboard — quick action "Add Trade"
 
-**Friction points (a medir y reducir):**
-1. Búsqueda de ticker — debería ser <300ms con debounce
-2. Captura de TC — debería ser automática, no manual
-3. Decisión de currency — debería ser auto desde el asset
-4. Validación de precio razonable — feedback inmediato si es muy distinto al actual
+**Friction points (to measure and reduce):**
+1. Ticker search — should be <300ms with debounce
+2. FX capture — should be automatic, not manual
+3. Currency decision — should be auto from the asset
+4. Reasonable-price validation — immediate feedback if very different from current price
 
-**Métrica de uso:** tiempo desde "abrir form" hasta "submitted". Target: P50 < 30s, P95 < 60s.
+**Usage metric:** time from "open form" to "submitted". Target: P50 < 30s, P95 < 60s.
 
-**Bloqueado por:** El currency hardcoded del P0 incluye este JTBD también. Mientras no exista FX-at-execution, el form omite ese campo crítico.
+**Blocked by:** the hardcoded currency from the P0 affects this JTBD too. Without FX-at-execution, the form omits that critical field.
 
-**Status actual:** Form existe, funcional, pero captura currency hardcoded y no captura FX rate. Necesita rework como parte del fix P0.
+**Current status:** Form exists, works, but captures hardcoded currency and doesn't capture FX rate. Needs rework as part of the P0 fix.
 
 ---
 
-## JTBD #6 — Posición en zona técnica notable
+## JTBD #6 — Position in notable technical zone
 
-**Statement:** *Cuando una de mis posiciones (o un activo de mi watchlist) entra en zona técnica notable (oversold/overbought según RSI, ruptura de Bollinger Bands, cruce de medias móviles), quiero verlo descrito en contexto, para incluirlo en mi reflexión semanal de portafolio.*
+**Statement:** *When one of my positions (or a watchlist asset) enters a notable technical zone (oversold/overbought per RSI, Bollinger Bands breakout, moving-average crossover), I want to see it described in context, so I can factor it into my weekly portfolio reflection.*
 
-**Datos necesarios:**
-- Historical prices daily ≥200 días (existe via `price_histories`)
-- Indicadores computados por asset (RSI(14), MACD, BB, MA50, MA200, EMA9/21)
-- TrendScore 5-factor (ya existe)
+**Required data:**
+- Historical daily prices ≥200 days (exists via `price_histories`)
+- Per-asset computed indicators (RSI(14), MACD, BB, MA50, MA200, EMA9/21)
+- TrendScore 5-factor (already exists)
 - User holdings + watchlist
 
-**Surface en la app:**
-- Asset detail — sección "Análisis técnico" con indicadores actuales + interpretación lingüística descriptiva
-- Dashboard — sección "Observaciones notables" cuando ≥1 asset relevante entra a zona
-- Market listings — hover/click revela TrendScore breakdown (ya existe desde Phase 21.1)
+**App surface:**
+- Asset detail — "Technical analysis" section with current indicators + descriptive interpretation
+- Dashboard — "Notable observations" section when ≥1 relevant asset enters a zone
+- Market listings — hover/click reveals TrendScore breakdown (exists since Phase 21.1)
 
 **Triggers:**
-- Daily EOD job: recompute indicadores, detectar transiciones (asset entró a oversold hoy / cruzó MA50 hoy)
-- Generate "observación" cuando hay transición, asociada a holding/watchlist del usuario
-- Dedup: una observación por asset/zona por semana (cooldown)
+- Daily EOD job: recompute indicators, detect transitions (asset entered oversold today / crossed MA50 today)
+- Generate "observation" when a transition occurs, associated with user's holding/watchlist
+- Dedup: one observation per asset/zone/week (cooldown)
 
-**Lenguaje requerido (ADR-001):**
-- ✅ *"AAPL aparece oversold según RSI(14) = 28"*
-- ✅ *"NVDA cruzó por debajo de su MA200"*
-- ❌ *"Considera comprar AAPL"*
+**Required language (ADR-001):**
+- ✅ *"AAPL appears oversold per RSI(14) = 28"*
+- ✅ *"NVDA crossed below its MA200"*
+- ❌ *"Consider buying AAPL"*
 
-**Métrica de uso:** Adrian abre ≥1 asset detail por semana desde una observación notable surface. Si las ignora, el JTBD no funciona o las observaciones son demasiado ruidosas.
+**Usage metric:** Adrian opens ≥1 asset detail per week from a surfaced notable observation. If he ignores them, the JTBD isn't working or the observations are too noisy.
 
-**Bloqueado por:** nada directamente (los indicadores ya se calculan). Falta el copy descriptivo, el surfacing como "observaciones notables", y el tuning del threshold para evitar ruido.
+**Blocked by:** nothing directly (indicators are already computed). Missing: descriptive copy, surfacing as "notable observations", and threshold tuning to avoid noise.
 
-**Status actual:** Indicadores calculados (Phase 21.1). Falta surface descriptivo + dedup + UI dedicada.
+**Current status:** Indicators computed (Phase 21.1). Missing descriptive surface + dedup + dedicated UI.
 
 ---
 
-## Cómo se agrega un nuevo JTBD
+## How a new JTBD gets added
 
-1. Trigger personal documentado: *"El [fecha] me pasó [situación específica], y no tuve [información/acción] disponible en Stockerly"*.
-2. Statement en formato canónico: *"Cuando X, quiero Y, para Z"*.
-3. Datos, surface, triggers, métrica, bloqueadores — completar las 6 secciones.
-4. Editar `audience.md` y `README.md` de vision para reflejar el nuevo número de JTBDs.
-5. Commit con mensaje *"docs(vision): add JTBD #N — [statement breve]"*.
+1. Documented personal trigger: *"On [date] I encountered [specific situation], and [information/action] wasn't available in Stockerly"*.
+2. Statement in canonical format: *"When X, I want Y, so that Z"*.
+3. Data, surface, triggers, metric, blockers — fill in the 6 sections.
+4. Edit `audience.md` and vision's `README.md` to reflect the new JTBD count.
+5. Commit with message *"docs(vision): add JTBD #N — [brief statement]"*.
 
-## Cómo se retira un JTBD
+## How a JTBD gets retired
 
-Si después de 90 días de implementado:
-- La métrica de uso no se cumple (Adrian no lo usa con la frecuencia esperada)
-- O Adrian admite explícitamente que no le sirve
+If after 90 days of being implemented:
+- The usage metric isn't met (Adrian doesn't use it with expected frequency)
+- Or Adrian explicitly admits it doesn't serve him
 
-→ retro lo marca para retiro. Issue en backlog: *"Retirar JTBD #N: razón"*. Las features asociadas se evalúan caso por caso (algunas pueden seguir como infra observable, otras se desimplementan).
+→ retro flags it for retirement. Backlog issue: *"Retire JTBD #N: reason"*. The associated features are evaluated case by case (some may stay as observable infra, others get de-implemented).

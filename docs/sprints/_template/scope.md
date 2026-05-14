@@ -1,12 +1,12 @@
 # Scope — Sprint <N>
 
-> Issues asignados a este sprint. Lo state-ful vive en GitHub (Milestone + Project); aquí solo el snapshot inicial + razón breve por issue.
+> Issues assigned to this sprint. State-ful work lives in GitHub (Milestone + Project); here just the initial snapshot + brief reason per issue.
 
 ---
 
 ## Main work
 
-<!-- Issues que corresponden al goal principal del sprint -->
+<!-- Issues that match the sprint's main goal -->
 
 | # | Title | JTBD / ADR | Discovery card OK? |
 |---|---|---|---|
@@ -15,18 +15,18 @@
 
 ## Parallel work (max 30% effort)
 
-<!-- Issues con label `parallel`: distintos al goal principal pero programados en este sprint para mantener ejes vivos (design system, ADRs, etc.) -->
+<!-- Issues labeled `parallel`: different from the main goal but scheduled in this sprint to keep axes alive (design system, ADRs, etc.) -->
 
-| # | Title | Eje parallel | Discovery card OK? |
+| # | Title | Parallel axis | Discovery card OK? |
 |---|---|---|---|
-| #N | ... | design / arquitectura / ... | ✅ |
+| #N | ... | design / architecture / ... | ✅ |
 
 ---
 
-## Reglas verificadas al abrir
+## Rules verified at opening
 
-- [ ] Cada issue tiene discovery card completa (sin label `discovery-needed`)
-- [ ] Total de issues `In Progress` ≤ 7 (regla dura)
-- [ ] Parallel ≤ 30% del esfuerzo total estimado
-- [ ] Goal de `GOAL.md` se cubre con los issues seleccionados
-- [ ] Issues `blocked` tienen su dependencia identificada
+- [ ] Each issue has a complete discovery card (no `discovery-needed` label)
+- [ ] Total `In Progress` issues ≤ 7 (hard rule)
+- [ ] Parallel ≤ 30% of total estimated effort
+- [ ] `GOAL.md` goal is covered by the selected issues
+- [ ] `blocked` issues have their dependency identified

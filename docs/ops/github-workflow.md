@@ -1,133 +1,133 @@
 # GitHub Workflow — Stockerly
 
-> Manual operativo de cómo usamos GitHub Issues + Projects + Milestones + Labels.
-> Establecido en Sprint 1 (2026-05-14). Referencia obligada antes de abrir un issue o un PR.
+> Operational manual for how we use GitHub Issues + Projects + Milestones + Labels.
+> Established in Sprint 1 (2026-05-14). Required reading before opening an issue or PR.
 
 ---
 
-## Estructura
+## Structure
 
-| Elemento | Dónde |
+| Element | Where |
 |---|---|
 | **Backlog items + bugs + research** | GitHub Issues |
 | **Sprint board (visual)** | GitHub Project v2 "Stockerly v2 Roadmap" |
-| **Sprint name + goal** | GitHub Milestone (uno por sprint) |
-| **Taxonomía de issues** | Labels (tipo, contexto, prioridad, estado, especiales) |
-| **Templates para crear issues** | `.github/ISSUE_TEMPLATE/*.yml` |
-| **Template para PRs** | `.github/PULL_REQUEST_TEMPLATE.md` |
-| **Long-form docs** | `docs/` (NO duplicar en issues) |
+| **Sprint name + goal** | GitHub Milestone (one per sprint) |
+| **Issue taxonomy** | Labels (type, context, priority, state, special) |
+| **Issue creation templates** | `.github/ISSUE_TEMPLATE/*.yml` |
+| **PR template** | `.github/PULL_REQUEST_TEMPLATE.md` |
+| **Long-form docs** | `docs/` (do NOT duplicate in issues) |
 
 ---
 
-## Setup actual (2026-05-14)
+## Current setup (2026-05-14)
 
 ### Repo
 
 - **URL:** [github.com/rodacato/stockerly](https://github.com/rodacato/stockerly)
-- **Visibilidad:** público
-- **Audiencia:** beta cerrada con ≤20 amigos (no aceptamos PRs externos hasta v1.0)
+- **Visibility:** public
+- **Audience:** closed beta with ≤20 friends (we don't accept external PRs until v1.0)
 - **CI:** GitHub Actions (test, security, deploy)
 
 ### Project v2
 
-- **Nombre:** `Stockerly v2 Roadmap`
+- **Name:** `Stockerly v2 Roadmap`
 - **Number:** 6
 - **Owner:** rodacato (user-scoped, no org)
-- **Status field (default):** `Todo` → `In Progress` → `Done` (simple, no se customizó)
-- **Items:** issues se agregan via `gh project item-add 6 --owner rodacato --url <issue-url>`
+- **Status field (default):** `Todo` → `In Progress` → `Done` (simple, not customized)
+- **Items:** issues are added via `gh project item-add 6 --owner rodacato --url <issue-url>`
 
-> **Nota:** No se customizó el Status field con columnas adicionales (Triage/Ready/In Sprint/In Review). En su lugar, el estado del workflow se lee combinando **labels** (`triage`, `ready`, `blocked`) y **Status del project** (`Todo`, `In Progress`, `Done`). Más simple. Si en el futuro se necesita board más rico, se customiza vía UI.
+> **Note:** the Status field wasn't customized with additional columns (Triage/Ready/In Sprint/In Review). Instead, workflow state is read by combining **labels** (`triage`, `ready`, `blocked`) and **project Status** (`Todo`, `In Progress`, `Done`). Simpler. If a richer board is needed later, customize via UI.
 
 ### Milestones (sprints)
 
-| # | Milestone | Sprint goal (resumen) |
+| # | Milestone | Sprint goal (summary) |
 |---|---|---|
-| 1 | `2026-S02-truth-foundation` | P0 multi-currency fase 1 + kill landing fake + Brand Discovery parallel |
-| 2 | `2026-S03-jtbd-alignment` | Calculadores currency-aware + deprecar LLM + cleanup analytics no-JTBD |
-| 3 | `2026-S04-jtbd-gap-fill` | CETES maturity + JTBD #6 "Observaciones notables" |
-| 4 | `2026-S05-architectural` | ADR-002 + cleanup eventos + SimpleUseCase |
-| 5 | `2026-S06-visual-coherence` | Landing/login con brand v2 + migración tokens final |
-| 6 | `2026-S07-beta-prep` | LFPDPPP + invite codes + onboarding mínimo |
+| 1 | `2026-S02-truth-foundation` | P0 multi-currency phase 1 + kill fake landing + Brand Discovery parallel |
+| 2 | `2026-S03-jtbd-alignment` | Currency-aware calculators + deprecate LLM + non-JTBD analytics cleanup |
+| 3 | `2026-S04-jtbd-gap-fill` | CETES maturity + JTBD #6 "Notable Observations" |
+| 4 | `2026-S05-architectural` | ADR-002 + events cleanup + SimpleUseCase |
+| 5 | `2026-S06-visual-coherence` | Landing/login with brand v2 + final tokens migration |
+| 6 | `2026-S07-beta-prep` | LFPDPPP + invite codes + minimal onboarding |
 
-Goal completo de cada milestone está en su descripción en GitHub (visible al abrir el milestone).
+Full goal for each milestone is in its description on GitHub (visible when opening the milestone).
 
-### Labels (taxonomía)
+### Labels (taxonomy)
 
-**Type** (tipo de trabajo):
-- `feat` — nueva funcionalidad mapeada a un JTBD
-- `bug` — defecto en funcionalidad existente
-- `chore` — mantenimiento, cleanup, deprecación
-- `docs` — cambios solo en documentación
-- `refactor` — cambio interno sin afectar comportamiento
-- `research` — pregunta abierta a investigar antes de scope
+**Type** (kind of work):
+- `feat` — new functionality mapped to a JTBD
+- `bug` — defect in existing functionality
+- `chore` — maintenance, cleanup, deprecation
+- `docs` — documentation-only changes
+- `refactor` — internal change without behavior impact
+- `research` — open question to investigate before scoping
 
-**Context** (bounded context tocado):
+**Context** (bounded context touched):
 - `ctx:trading`, `ctx:market-data`, `ctx:alerts`, `ctx:identity`, `ctx:notifications`, `ctx:admin`
 
 **Priority**:
-- `P0` — beta-blocker o rompe JTBD core
-- `P1` — cleanup/refactor antes de features nuevos
+- `P0` — beta-blocker or breaks core JTBD
+- `P1` — cleanup/refactor before new features
 - `P2` — quality / polish
 
 **State**:
-- `triage` — nuevo, sin revisar (default en templates)
-- `ready` — discovery complete, listo para sprint
-- `blocked` — esperando dependencia o decisión
+- `triage` — new, not yet reviewed (default in templates)
+- `ready` — discovery complete, ready for a sprint
+- `blocked` — waiting on dependency or decision
 
 **Special**:
-- `discovery-needed` — falta uno o más campos de discovery card
-- `beta-blocker` — no se invita amigos hasta resolver
-- `design` — diseño / visual / UX
-- `parallel` — eje parallel en sprint con goal principal distinto
+- `discovery-needed` — missing one or more discovery card fields
+- `beta-blocker` — no friends invited until resolved
+- `design` — design / visual / UX work
+- `parallel` — parallel axis in a sprint whose main goal is different
 
 ---
 
-## Cómo abrir un issue
+## How to open an issue
 
 ### Feature / Refactor / Chore / Docs
 
-1. Ve a [New Issue](https://github.com/rodacato/stockerly/issues/new/choose)
-2. Selecciona "Feature / Refactor / Chore"
-3. Llena los 4 campos de Discovery Card:
-   1. **Trigger personal documentado** (fecha + situación específica)
-   2. **JTBD** ("Cuando X, quiero Y, para Z" — debe mapear a uno de los 6 canónicos o justificar nuevo)
-   3. **Métrica de uso**
-   4. **Definition of Done** (checklist concreto)
-4. Si no puedes llenar los 4 → el issue queda con `discovery-needed` y `triage`
-5. Aplica labels de tipo, contexto, prioridad
-6. Asigna milestone si ya sabes a qué sprint pertenece
+1. Go to [New Issue](https://github.com/rodacato/stockerly/issues/new/choose)
+2. Select "Feature / Refactor / Chore"
+3. Fill the 4 Discovery Card fields:
+   1. **Documented personal trigger** (date + specific situation)
+   2. **JTBD** ("When X, I want Y, so that Z" — must map to one of the 6 canonical or justify a new one)
+   3. **Usage metric**
+   4. **Definition of Done** (concrete checklist)
+4. If you can't fill all 4 → the issue stays with `discovery-needed` and `triage`
+5. Apply type, context, and priority labels
+6. Assign milestone if you already know which sprint it belongs to
 
 ### Bug
 
-1. Selecciona "Bug" template
-2. Indica qué pasó, qué esperabas, pasos para reproducir
-3. **NO incluyas datos financieros reales** (montos, posiciones, account IDs) — usa ejemplos sintéticos
-4. Aplica label `bug` + `ctx:*` + severity
+1. Select "Bug" template
+2. Describe what happened, what you expected, repro steps
+3. **Do NOT include real financial data** (amounts, positions, account IDs) — use synthetic examples
+4. Apply `bug` + `ctx:*` + severity labels
 
 ### Research
 
-1. Selecciona "Research" template
-2. Indica pregunta abierta, por qué importa, hipótesis, criterio de cierre
-3. Lista expertos del panel a consultar (en `docs/research/experts.md`)
-4. Output esperado: ADR + posible feature issue subsecuente
+1. Select "Research" template
+2. State the open question, why it matters, hypothesis, closure criterion
+3. List experts from the panel to consult (in `docs/research/experts.md`)
+4. Expected output: ADR + possible subsequent feature issue
 
 ---
 
-## Cómo abrir un PR
+## How to open a PR
 
-1. Fixea un issue: en commit o PR body usa `Fixes #N` (auto-cierra al merge)
-2. Llena el PR template (`.github/PULL_REQUEST_TEMPLATE.md`):
-   - Qué hace el PR (1-3 frases, why before what)
+1. Reference an issue: in commit or PR body use `Fixes #N` (auto-close on merge)
+2. Fill the PR template (`.github/PULL_REQUEST_TEMPLATE.md`):
+   - What the PR does (1-3 sentences, why before what)
    - Linked issue
-   - Checklist obligatorio:
-     - Tests pasan
-     - Rubocop limpio
+   - Mandatory checklist:
+     - Tests pass
+     - Rubocop clean
      - ADR-001: no prescriptive language
      - Vision: no fiscal additions
-     - No co-author en commits
-     - Discovery card completa (si es feat)
-     - ADR existe (si es refactor arquitectural)
-3. Commits sin `Co-Authored-By` ni mención de AI
+     - No co-author in commits
+     - Discovery card complete (if feat)
+     - ADR exists (if architectural refactor)
+3. Commits without `Co-Authored-By` or AI mention
 
 ---
 
@@ -135,88 +135,88 @@ Goal completo de cada milestone está en su descripción en GitHub (visible al a
 
 ### Planning
 
-1. Lee los issues con label `ready` que no tienen milestone asignado
-2. Lee el goal del próximo milestone (`gh api repos/rodacato/stockerly/milestones`)
-3. Mueve issues al milestone — máximo 7 simultáneamente en `In Progress` (regla dura)
-4. Define **1 frase de goal** en la descripción del milestone (si no está)
-5. Si un issue tiene `parallel` label, está OK que el milestone tenga goal distinto — los parallel cumplen al menos 30% del esfuerzo del sprint
+1. Read issues with label `ready` that don't have a milestone assigned
+2. Read the next milestone's goal (`gh api repos/rodacato/stockerly/milestones`)
+3. Move issues to the milestone — maximum 7 simultaneous `In Progress` (hard rule)
+4. Define **1-sentence goal** in the milestone description (if not already there)
+5. If an issue has `parallel` label, it's OK for the milestone to have a different main goal — parallel items take at most 30% of effort
 
 ### Execution
 
-1. Cada commit referencia el sprint (ej. `feat(trading): capture FX at execution [#27]`)
-2. Mueve issue de `Todo` → `In Progress` en Project board al empezar
-3. PR linkea issue con `Fixes #N`
-4. Mueve a `Done` al merge
+1. Each commit references the sprint (e.g., `feat(trading): capture FX at execution [#27]`)
+2. Move issue from `Todo` → `In Progress` in Project board when starting it
+3. PR links the issue with `Fixes #N`
+4. Move to `Done` on merge
 
 ### Close
 
-**Antes de marcar sprint como cerrado:**
+**Before marking sprint as closed:**
 
-- [ ] Goal del milestone se cumplió o se documentó por qué no
-- [ ] CI verde (`bundle exec rspec`, `bin/rubocop`, `bin/brakeman`, `bin/bundler-audit`)
-- [ ] No copy nuevo viola ADR-001 (audit manual)
-- [ ] No features nuevas violan non-goals (audit manual)
-- [ ] Sprint retro escrito en `docs/sprints/<sprint-name>/retro.md`
-- [ ] Retro responde: ¿qué funcionó / qué no / qué cambiar / cuáles de los 6 ejes de alineación subieron?
-- [ ] Issues cerradas tienen status `Done` en el project
+- [ ] Milestone goal achieved or documented why not
+- [ ] CI green (`bundle exec rspec`, `bin/rubocop`, `bin/brakeman`, `bin/bundler-audit`)
+- [ ] No new copy violates ADR-001 (manual audit)
+- [ ] No new features violate non-goals (manual audit)
+- [ ] Sprint retro written in `docs/sprints/<sprint-name>/retro.md`
+- [ ] Retro answers: what worked / what didn't / what to change / which of the 6 alignment axes improved?
+- [ ] Closed issues have status `Done` in the project
 
-**Regla dura:** no se abre siguiente sprint con anterior abierto. Si hay issues sin cerrar al final, deciden:
-- Pasar a backlog (sin milestone) si ya no son urgentes
-- Re-asignar a próximo milestone si siguen vivos
+**Hard rule:** no new sprint opens while the previous one is open. If issues remain unclosed at the end, decide:
+- Move to backlog (no milestone) if no longer urgent
+- Re-assign to the next milestone if still alive
 
 ---
 
-## Comandos útiles (`gh` CLI)
+## Useful commands (`gh` CLI)
 
 ```bash
-# Listar issues abiertos por milestone
+# List open issues by milestone
 gh issue list --milestone "2026-S02-truth-foundation"
 
-# Listar issues con label
+# List issues by label
 gh issue list --label "P0"
 
-# Ver un issue completo
+# View a full issue
 gh issue view 27
 
-# Listar milestones
+# List milestones
 gh api repos/rodacato/stockerly/milestones --jq '.[] | "[\(.number)] \(.title)"'
 
-# Listar items del project
+# List project items
 gh project item-list 6 --owner rodacato
 
-# Agregar issue al project
+# Add an issue to the project
 gh project item-add 6 --owner rodacato --url https://github.com/rodacato/stockerly/issues/N
 ```
 
 ---
 
-## Errores comunes a evitar
+## Common mistakes to avoid
 
-1. **Crear issue sin discovery card completa** → queda en `triage` con `discovery-needed`. No avanza a `ready` hasta que se complete. No se trabaja en él.
-2. **Duplicar info entre issue y `docs/`** → docs son para evergreen (vision, ADR, design system, research notes); issues son para state-ful work. Si el issue describe arquitectura, link al ADR, no la copies.
-3. **Issues con info sensible** → repo es público. NO incluir montos, account numbers, screenshots de datos personales reales. Usar ejemplos sintéticos.
-4. **Co-author en commits** → prohibido por convención del proyecto (memoria `feedback_no_coauthor.md`).
-5. **Abrir nuevo sprint con anterior abierto** → no se hace.
-6. **Saltarse QA antes de cerrar sprint** → no se hace. La trampa más común es "los tests pasan, ship it" sin validar ADR-001 / non-goals manualmente.
+1. **Creating an issue without a complete discovery card** → stays in `triage` with `discovery-needed`. Doesn't advance to `ready` until completed. Not worked on.
+2. **Duplicating info between issue and `docs/`** → docs are for evergreen (vision, ADR, design system, research notes); issues are for state-ful work. If the issue describes architecture, link to the ADR, don't copy it.
+3. **Issues with sensitive info** → repo is public. Do NOT include amounts, account numbers, real personal data screenshots. Use synthetic examples.
+4. **Co-author in commits** → forbidden by project convention (memory file `feedback_no_coauthor.md`).
+5. **Opening a new sprint with the previous one open** → don't do it.
+6. **Skipping QA before closing a sprint** → don't do it. The most common trap is "tests pass, ship it" without manually validating ADR-001 / non-goals.
 
 ---
 
-## Cómo refrescar `gh` auth (si Project v2 no funciona)
+## How to refresh `gh` auth (if Project v2 doesn't work)
 
 ```bash
 gh auth refresh -s project,read:project
 ```
 
-Los scopes actuales requeridos: `repo`, `workflow`, `read:org`, `gist`, `project`, `read:project`.
+Currently required scopes: `repo`, `workflow`, `read:org`, `gist`, `project`, `read:project`.
 
 ---
 
-## Referencias
+## References
 
-- [Vision](../vision/README.md) — norte y 3 reglas duras
-- [JTBDs](../vision/jobs-to-be-done.md) — los 6 canónicos
-- [Non-goals](../vision/non-goals.md) — lo que NO somos
-- [ADR-001](../architecture/adr/0001-descriptive-not-prescriptive-language.md) — lenguaje del producto
-- [Code Audit 2026-05](../research/code-audit-2026-05/README.md) — insumo del backlog inicial
-- [Expert Panel](../research/experts.md) — consultas estructuradas
-- [Working method memory](../../.claude/memory/project_working_method.md) — versión persistente del asistente AI
+- [Vision](../vision/README.md) — north star and 3 hard rules
+- [JTBDs](../vision/jobs-to-be-done.md) — the 6 canonical
+- [Non-goals](../vision/non-goals.md) — what we are NOT
+- [ADR-001](../architecture/adr/0001-descriptive-not-prescriptive-language.md) — product language
+- [Code Audit 2026-05](../research/code-audit-2026-05/README.md) — initial backlog input
+- [Expert Panel](../research/experts.md) — structured consultations
+- [Working method memory](../../.claude/memory/project_working_method.md) — AI assistant's persistent version

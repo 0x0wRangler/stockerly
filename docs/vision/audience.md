@@ -1,82 +1,82 @@
-# Audiencia de Stockerly
+# Stockerly Audience
 
-> Para que algo sea feature, alguien de esta lista tiene que necesitarlo realmente.
-> Si nadie aquí lo necesita, no se construye. Punto.
+> For something to qualify as a feature, someone on this list must actually need it.
+> If nobody here needs it, it doesn't get built. Full stop.
 
-## Usuario primario — Adrian (fundador, dogfood)
+## Primary user — Adrian (founder, dogfood)
 
-- Inversor personal con patrimonio dividido en **MXN (CETES, posiblemente Cetesdirecto)** y **USD (acciones NYSE/NASDAQ vía broker que opera USD para residentes MX)**.
-- Mismas acciones cotizadas en USD; flujo común: convertir MXN→USD para invertir, eventualmente convertir USD→MXN.
-- Revisa portafolio **semanalmente**, no diariamente. No es day trader.
-- Conoce código, valora arquitectura limpia, pero ya está harto de over-engineering propio.
+- Personal investor with patrimony split between **MXN (CETES, possibly Cetesdirecto)** and **USD (NYSE/NASDAQ-listed equities, bought via a Mexican broker that operates in USD for MX residents)**.
+- The same stocks are quoted in USD; common flow: convert MXN→USD to invest, eventually convert USD→MXN.
+- Reviews portfolio **weekly**, not daily. Not a day trader.
+- Knows how to code, values clean architecture, but is fed up with his own over-engineering.
 
-**Jobs to be Done (JTBD) del primario:**
-1. *Cuando reviso mi portafolio el fin de semana, quiero ver mi patrimonio total consolidado en MXN, para saber si subí o bajé desde la última vez.*
-2. *Cuando mi posición baja X% desde costo promedio (en MXN), quiero saberlo, para decidir promediar o salir.*
-3. *Cuando un CETE está por vencer, quiero saberlo con 7 días de anticipación, para decidir reinvertir.*
-4. *Cuando entra earnings de algo que tengo, quiero saberlo con 2 días de anticipación, para no enterarme después.*
-5. *Cuando agrego un trade nuevo, quiero capturarlo en menos de 30 segundos, para no abandonar el registro por flojera.*
-6. *Cuando una de mis posiciones (o un activo de mi watchlist) entra en zona técnica notable (oversold/overbought según RSI, ruptura de Bollinger Bands, cruce de medias móviles), quiero verlo descrito en contexto, para incluirlo en mi reflexión semanal de portafolio.*
+**Jobs to be Done (JTBD):**
+1. *When I review my portfolio over the weekend, I want to see my total patrimony consolidated in MXN, so I can know whether I'm up or down since last time.*
+2. *When my position drops X% from average cost (in MXN), I want to know, so I can decide whether to average down or exit.*
+3. *When a CETE is about to mature, I want to know with 7 days of lead time, so I can decide whether to reinvest.*
+4. *When an earnings event is coming for something I hold, I want to know 2 days ahead, so I don't find out after the fact.*
+5. *When I add a new trade, I want to capture it in under 30 seconds, so I don't abandon the recording out of laziness.*
+6. *When one of my positions (or a watchlist asset) enters a notable technical zone (oversold/overbought per RSI, Bollinger Bands break, moving-average crossover), I want to see it described in context, so I can factor it into my weekly portfolio reflection.*
 
-**Restricción de lenguaje del producto (ADR-001 pendiente de redacción formal):**
-- Stockerly habla en lenguaje descriptivo: *"AAPL aparece oversold según RSI(14)"*.
-- Stockerly NO habla en lenguaje prescriptivo: *"compra AAPL"*, *"considera vender"*, *"buen momento para..."*.
-- Indicadores técnicos, scores compuestos (TrendScore, F&G), interpretaciones de estado ("oversold", "overbought", "ruptura") son válidos.
-- Predicciones probabilísticas y recomendaciones de acción quedan fuera.
+**Product language constraint (formalized in ADR-001):**
+- Stockerly speaks descriptively: *"AAPL appears oversold per RSI(14)"*.
+- Stockerly does NOT speak prescriptively: *"buy AAPL"*, *"consider selling"*, *"good time to..."*.
+- Technical indicators, composite scores (TrendScore, F&G), state interpretations ("oversold", "overbought", "breakout") are valid.
+- Probabilistic predictions and action recommendations are out.
 
-**Lo que explícitamente NO está en scope (decidido 2026-05-14):**
-- ❌ Reportes fiscales (ISR, declaración, retención de dividendos, ganancia cambiaria fiscal)
-- ❌ Integraciones con SAT
-- ❌ Cálculos para preparar declaración anual
+**Explicitly OUT of scope (decided 2026-05-14):**
+- ❌ Fiscal reports (ISR, declarations, dividend withholding, foreign-exchange fiscal calculations)
+- ❌ SAT integrations
+- ❌ Calculations to prepare annual tax declaration
 
-## Usuarios secundarios — Beta cerrada con cupo (≤ 20 amigos)
+## Secondary users — Closed beta with cap (≤ 20 friends)
 
-- Inversores mexicanos con perfil **similar** a Adrian: portafolio mixto MXN+USD, frecuencia semanal/mensual.
-- Acceso **solo por invitación explícita de Adrian** (no auto-registro público).
-- **No** son PMs, no son traders activos, no son menores de edad.
+- Mexican investors with a profile **similar** to Adrian: mixed MXN+USD portfolio, weekly/monthly cadence.
+- Access **only by Adrian's explicit invitation** (no public self-registration).
+- **NOT** PMs, not active traders, not minors.
 
-**Lo que Adrian les promete:**
-- Aviso de privacidad LFPDPPP-compliant
-- Derecho a exportar todos sus datos y eliminar cuenta cuando quieran
-- Honestidad sobre el estado: es un proyecto personal, no producto comercial — *use at your own risk*
+**What Adrian promises them:**
+- LFPDPPP-compliant privacy notice
+- Right to export all their data and delete their account whenever they want
+- Honesty about the state: this is a personal project, not a commercial product — *use at your own risk*
 
-**Lo que Adrian NO les promete:**
-- Disponibilidad garantizada (puede estar caído fines de semana, en mantenimiento, etc.)
-- Aviso anticipado de cambios breaking — *eres beta tester, no cliente*
-- Soporte fuera del "se rompió, dime y vemos"
+**What Adrian does NOT promise them:**
+- Guaranteed uptime (it may be down weekends, during maintenance, etc.)
+- Advance notice of breaking changes — *you're a beta tester, not a customer*
+- Support beyond "it broke, tell me and we'll see"
 
-**Hipótesis a validar con la beta (no asunciones):**
-- H1: Los amigos comparten al menos 3 de los 5 JTBD del primario.
-- H2: La interfaz en es-MX (no traducida del inglés) reduce fricción de entendimiento.
-- H3: Algo concreto los retiene más allá de la novedad inicial — *qué exactamente queda por descubrir*.
+**Hypotheses to validate with the beta (not assumed):**
+- H1: Friends share at least 3 of the primary user's 5 JTBDs.
+- H2: An interface written in es-MX (not translated from English) reduces friction.
+- H3: Something concrete keeps them coming back beyond initial novelty — *what exactly remains to be discovered*.
 
-Si H1 o H3 se invalidan en los primeros 5 amigos invitados → revisar audiencia, no insistir.
+If H1 or H3 is invalidated with the first 5 invited friends → revisit audience, don't double down.
 
-## Non-users (lo que explícitamente NO somos)
+## Non-users (what we explicitly are NOT)
 
-- ❌ **Day traders / scalpers** — la app no soporta time-resolution sub-diaria.
-- ❌ **Inversores institucionales / advisors** — no hay multi-tenant, no hay accounts.
-- ❌ **Público general que llega por Google** — no hay landing comercial, no hay SEO, no hay funnel.
-- ❌ **Inversores fuera de México** — la lógica está modelada en torno a MXN+USD vía broker MX.
-- ❌ **Comunidad de devs que forkean** — el repo está público como portfolio, pero no aceptamos PRs hasta v1.0.
+- ❌ **Day traders / scalpers** — the app doesn't support sub-daily time resolution.
+- ❌ **Institutional investors / advisors** — no multi-tenant, no accounts.
+- ❌ **General public arriving via Google** — no commercial landing, no SEO, no funnel.
+- ❌ **Investors outside Mexico** — the logic is modeled around MXN+USD via a Mexican broker.
+- ❌ **OSS contributors who fork** — the repo is public as portfolio, but we do not accept PRs until v1.0.
 
-## Tamaño del cupo (beta cerrada)
+## Beta cap size
 
-- **Tope inicial:** 20 usuarios totales (Adrian + 19 invitados).
-- **Razón:** soporte personal sostenible, feedback gestionable, datos personales acotados.
-- **Mecanismo:** códigos de invitación de un solo uso generados por Adrian desde admin.
-- **Expansión del cupo:** revisar solo después de que (a) multi-currency MXN/USD esté completo, (b) gain/loss consolidado en MXN funcione, (c) Adrian haya pasado un trimestre sin pedir ayuda para usar la app él mismo.
+- **Initial cap:** 20 users total (Adrian + 19 invitees).
+- **Reason:** sustainable personal support, manageable feedback, bounded personal data.
+- **Mechanism:** single-use invitation codes generated by Adrian from admin.
+- **Cap expansion:** revisit only after (a) MXN/USD multi-currency is complete, (b) consolidated gain/loss in MXN works, (c) Adrian has gone a quarter without needing help to use the app himself.
 
-## Cuándo cambiarán las reglas de "use at your own risk"
+## When the "use at your own risk" rules change
 
-- **Solo si:** Stockerly se convierte en producto de paga / monetizado.
-- **En ese momento:** se introducen SLAs, soporte estructurado, aviso de breaking changes, etc.
-- **Mientras tanto:** producto personal abierto a amigos invitados. Nada más.
+- **Only if:** Stockerly becomes a paid / monetized product.
+- **At that point:** SLAs are introduced, structured support, advance notice of breaking changes, etc.
+- **Until then:** personal product open to invited friends. Nothing more.
 
-## Implicaciones inmediatas (lo que cambia de inmediato)
+## Immediate implications (what changes right now)
 
-1. **No se invita a nadie hasta resolver `currency: "USD"` hardcoded.** Sin esto, el JTBD #1 (patrimonio consolidado en MXN) miente.
-2. **Aviso de privacidad LFPDPPP** antes del primer invitado. Sprint 3 lo incluye.
-3. **Sistema de invitación por código de un solo uso** = feature mínima para arrancar (no auto-registro).
-4. **Onboarding deja de ser vanity** — primeros 5 minutos de un amigo definen si vuelve.
-5. **Sin SLA formal** mientras sea beta personal. Lenguaje en aviso de privacidad debe reflejarlo.
+1. **No one is invited until the `currency: "USD"` hardcode is resolved.** Without that, JTBD #1 (consolidated patrimony in MXN) lies.
+2. **An LFPDPPP privacy notice is needed** before the first invitee. Sprint 3 includes it.
+3. **Invitation-code system (single-use)** = minimum feature to launch (no self-registration).
+4. **Onboarding stops being vanity** — the first 5 minutes of a friend's experience determine whether they return.
+5. **No formal SLA** while this remains personal beta. The privacy notice must reflect that.

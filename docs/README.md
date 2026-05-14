@@ -1,51 +1,51 @@
 # Stockerly — docs/
 
-> Documentación viva del proyecto. **Cada archivo aquí refleja la realidad actual.** Lo aspiracional/histórico vive en `docs/archive/`.
+> Living project documentation. **Every file here reflects the current reality.** Aspirational/historical material lives in `docs/archive/`.
 >
-> Estructura establecida en Sprint 1 (2026-05-14).
+> Structure established in Sprint 1 (2026-05-14).
 
 ---
 
-## Cómo navegar
+## How to navigate
 
-| Si buscas... | Vete a |
+| If you're looking for... | Go to |
 |---|---|
-| Por qué existe Stockerly, para quién | [`vision/`](./vision/) |
-| Decisiones de arquitectura inmutables | [`architecture/adr/`](./architecture/adr/) |
-| Cómo están organizados los bounded contexts | [`architecture/README.md`](./architecture/README.md) |
-| Sistema de diseño, design tokens | [`design/`](./design/) (placeholder hasta Sprint 2) |
-| Notas de investigación, code audits, panel de expertos | [`research/`](./research/) |
+| Why Stockerly exists, for whom | [`vision/`](./vision/) |
+| Immutable architecture decisions | [`architecture/adr/`](./architecture/adr/) |
+| How bounded contexts are organized | [`architecture/README.md`](./architecture/README.md) |
+| Design system, design tokens | [`design/`](./design/) (placeholder until Sprint 2) |
+| Research notes, code audits, expert panel | [`research/`](./research/) |
 | Deploy, security, runbooks | [`ops/`](./ops/) |
-| Protocolo de sprint, retros | [`sprints/`](./sprints/) (placeholder hasta Paso 8 del Sprint 1) |
-| Branding (logos, paleta, tipografía) | [`branding/`](./branding/) |
-| Screenshots para README/showcase | [`screenshots/`](./screenshots/) |
-| Documentos archivados (NO son fuente de verdad) | [`archive/`](./archive/) |
+| Sprint protocol, retros | [`sprints/`](./sprints/) |
+| Branding (logos, palette, typography) | [`branding/`](./branding/) |
+| Screenshots for README/showcase | [`screenshots/`](./screenshots/) |
+| Archived documents (NOT current source of truth) | [`archive/`](./archive/) |
 
 ---
 
-## Reglas duras
+## Hard rules
 
-1. **Una fuente de verdad por tipo.** Vision en `vision/`, decisiones en `architecture/adr/`, backlog en GitHub Issues, sprints en GitHub Projects. Nunca duplicar.
-2. **Si está en `archive/`, no es verdad actual.** Mapear a su equivalente vivo arriba.
-3. **Doc > 200 líneas: auditar.** ¿Es referencia o ficción? La docs útil cabe en una pantalla.
-4. **Edits a `vision/` o `architecture/adr/`** requieren commit message con razón.
+1. **One source of truth per type.** Vision in `vision/`, decisions in `architecture/adr/`, backlog in GitHub Issues, sprints in GitHub Projects. Never duplicate.
+2. **If it's in `archive/`, it's not current truth.** Map it to its live equivalent above.
+3. **Doc > 200 lines: audit it.** Is it a reference or fiction? Useful documentation fits on a single screen.
+4. **Edits to `vision/` or `architecture/adr/`** require a commit message explaining the reason.
 
 ---
 
-## Documentos del root del repo (referenciados desde aquí)
+## Root-of-repo documents (referenced from here)
 
-| Doc | Propósito |
+| Doc | Purpose |
 |---|---|
-| [`/IDENTITY.md`](../IDENTITY.md) | Rol y compromisos del asistente AI |
-| [`/CLAUDE.md`](../CLAUDE.md) | Contexto técnico que el asistente AI lee automáticamente |
-| [`/README.md`](../README.md) | Presentación pública del proyecto |
-| [`/CONTRIBUTING.md`](../CONTRIBUTING.md) | (Reservado — beta cerrada, no aceptamos PRs hasta v1.0) |
-| [`/RELEASING.md`](../RELEASING.md) | Proceso de release |
-| [`/CHANGELOG.md`](../CHANGELOG.md) | Historial de cambios significativos |
-| [`/SECURITY.md`](../SECURITY.md) | Cómo reportar vulnerabilidades |
+| [`/IDENTITY.md`](../IDENTITY.md) | Role and commitments of the AI assistant |
+| [`/CLAUDE.md`](../CLAUDE.md) | Technical context the AI assistant reads automatically |
+| [`/README.md`](../README.md) | Public-facing project introduction |
+| [`/CONTRIBUTING.md`](../CONTRIBUTING.md) | (Reserved — closed beta, no PRs accepted until v1.0) |
+| [`/RELEASING.md`](../RELEASING.md) | Release process |
+| [`/CHANGELOG.md`](../CHANGELOG.md) | Significant changes history |
+| [`/SECURITY.md`](../SECURITY.md) | Vulnerability reporting |
 
 ---
 
-## Memoria persistente del asistente AI
+## AI assistant's persistent memory
 
-Vive en [`../.claude/memory/`](../.claude/memory/). Es trackeada en git y carga automática del asistente. Contiene perfil del usuario, vision, decisiones, anti-patterns y mandato de honestidad brutal.
+Lives at [`../.claude/memory/`](../.claude/memory/). Tracked in git and auto-loaded by the assistant. Contains user profile, vision, decisions, anti-patterns, and brutal-honesty mandate.

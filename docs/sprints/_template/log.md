@@ -1,29 +1,29 @@
 # Log — Sprint <N>
 
-> Notas NO-triviales durante la ejecución. **No es un journal diario.** Solo lo que querrías recordar leer al revisar este sprint en 6 meses.
+> NON-trivial notes during execution. **Not a daily journal.** Only what you'd want to remember when reviewing this sprint in 6 months.
 >
-> Qué SÍ va aquí:
-> - Decisiones tomadas mid-sprint (no triviales)
-> - Expertos consultados y qué dijeron
-> - Problemas descubiertos que no estaban en discovery
-> - Issues nuevos abiertos durante el sprint y por qué
-> - Cambios de alcance (con razón)
+> What goes here:
+> - Mid-sprint decisions (non-trivial)
+> - Experts consulted and what they said
+> - Problems discovered that weren't in discovery
+> - New issues opened during the sprint and why
+> - Scope changes (with reason)
 >
-> Qué NO va aquí:
-> - "Hice X commit hoy"
-> - Lista de commits (eso ya está en `git log`)
-> - Detalles de implementación (eso vive en el código)
+> What does NOT go here:
+> - "I did commit X today"
+> - List of commits (that's already in `git log`)
+> - Implementation details (those live in the code)
 
 ---
 
-## YYYY-MM-DD — <tema breve>
+## YYYY-MM-DD — <brief topic>
 
-<!-- Ej: 2026-05-15 — Decisión: usar Banxico FIX en vez de SF60653 -->
+<!-- e.g.: 2026-05-15 — Decision: use Banxico FIX instead of SF60653 -->
 
-<!-- 1-3 párrafos -->
+<!-- 1-3 paragraphs -->
 
 ---
 
-## YYYY-MM-DD — <tema breve>
+## YYYY-MM-DD — <brief topic>
 
 ...

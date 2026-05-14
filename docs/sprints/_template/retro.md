@@ -1,81 +1,81 @@
 # Retro — Sprint <N>
 
-> Post-mortem honesto. Sin retro, el sprint NO se cierra (regla dura del protocolo).
+> Honest post-mortem. Without retro, the sprint does NOT close (hard rule of the protocol).
 >
-> **Fecha cierre:** YYYY-MM-DD
-> **Duración real:** N semanas (vs estimado: N semanas)
-> **Goal:** <copia del GOAL.md>
+> **Close date:** YYYY-MM-DD
+> **Actual duration:** N weeks (vs estimated: N weeks)
+> **Goal:** <copy from GOAL.md>
 
 ---
 
-## ¿Qué funcionó?
+## What worked?
 
-<!-- Cosas que replicaría en próximos sprints. Específico, no genérico. -->
-
-- ...
-
-## ¿Qué no funcionó?
-
-<!-- Cosas que no replicaría. Específico, no genérico. -->
+<!-- Things to replicate in next sprints. Specific, not generic. -->
 
 - ...
 
-## ¿Qué cambiar para el próximo sprint?
+## What didn't work?
 
-<!-- Acción concreta, no aspiración. -->
+<!-- Things not to replicate. Specific, not generic. -->
+
+- ...
+
+## What to change for the next sprint?
+
+<!-- Concrete action, not aspiration. -->
 
 - [ ] ...
 - [ ] ...
 
 ---
 
-## Alineación con la vision — estado de los 6 ejes
+## Vision alignment — state of the 6 axes
 
-> ¿En qué % se siente cada eje vs antes del sprint?
+> What % does each axis feel like vs before the sprint?
 
-| # | Eje | Antes | Después | Notas |
+| # | Axis | Before | After | Notes |
 |---|---|---|---|---|
-| 1 | Cada feature mapea a JTBD | X% | Y% | ... |
-| 2 | Cero copy prescriptivo en código | X% | Y% | ... |
-| 3 | Cero copy aspiracional falso | X% | Y% | ... |
-| 4 | Aritmética del dashboard veraz para MXN+USD | X% | Y% | ... |
-| 5 | Arquitectura sin fugas cross-context | X% | Y% | ... |
-| 6 | Docs reflejan código actual | X% | Y% | ... |
+| 1 | Every feature maps to a JTBD | X% | Y% | ... |
+| 2 | Zero prescriptive copy in code | X% | Y% | ... |
+| 3 | Zero aspirational fake copy | X% | Y% | ... |
+| 4 | Dashboard arithmetic truthful for MXN+USD | X% | Y% | ... |
+| 5 | Architecture without cross-context leaks | X% | Y% | ... |
+| 6 | Docs reflect current code | X% | Y% | ... |
 
 ---
 
-## Anti-patterns que cometí (si los hubo)
+## Anti-patterns I committed (if any)
 
-> Revisar contra `.claude/memory/feedback_anti_patterns.md`. Si caí en alguno, nombrarlo aquí (no para flagelarme, para corregir).
+> Review against `.claude/memory/feedback_anti_patterns.md`. If I fell into one, name it here (not to self-flagellate, but to correct).
 
 - ...
 
 ---
 
-## Tiempo real vs estimado
+## Real vs estimated time
 
-| Tarea / Issue | Estimado | Real | Razón del desvío |
+| Task / Issue | Estimated | Real | Reason for deviation |
 |---|---|---|---|
-| #N | X días | Y días | ... |
+| #N | X days | Y days | ... |
 
 ---
 
-## Decisiones registradas (link a ADRs si aplica)
+## Registered decisions (link to ADRs if applicable)
 
-- ADR-NNN: ... (si se escribió alguno durante el sprint)
-- Decisión informal: ... (registrar aquí si no ameritó ADR pero querrías recordar)
-
----
-
-## Issues abiertos al cierre
-
-<!-- Issues del scope que NO se cerraron. Decisión por cada uno: pasar a backlog vs re-asignar. -->
-
-- #N — pasar a backlog (razón: ...)
-- #N — re-asignar a próximo sprint (razón: ...)
+- ADR-NNN: ... (if one was written during the sprint)
+- Informal decision: ... (note here if it didn't warrant an ADR but you'd want to remember)
 
 ---
 
-## Cita brutal del sprint
+## Issues open at close
 
-> <!-- Una frase honesta que capture la lección principal. Ejemplo: "El P0 multi-currency era 4x más grande de lo que estimé. Calibrar próximo sprint con un 2x buffer en P0s estructurales." -->
+<!-- Issues from the scope that did NOT close. Decision per each: move to backlog vs reassign. -->
+
+- #N — move to backlog (reason: ...)
+- #N — reassign to next sprint (reason: ...)
+
+---
+
+## Brutal quote of the sprint
+
+> <!-- One honest sentence capturing the main lesson. Example: "The P0 multi-currency was 4x bigger than I estimated. Calibrate the next sprint with a 2x buffer on structural P0s." -->

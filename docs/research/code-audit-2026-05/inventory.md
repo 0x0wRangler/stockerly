@@ -1,13 +1,13 @@
-# Code Audit — Inventario Crudo
+# Code Audit — Raw Inventory
 
-> **Fecha:** 2026-05-14
-> **Fuente:** sub-agent Hiroto (architecture) + grep manual.
+> **Date:** 2026-05-14
+> **Source:** sub-agent Hiroto (architecture) + manual grep.
 
 ---
 
-## Bounded Contexts — inventory por BC
+## Bounded Contexts — inventory per BC
 
-| BC | Use Cases | Events | Handlers | Contracts | Domain Services | Gateways | Models AR |
+| BC | Use Cases | Events | Handlers | Contracts | Domain Services | Gateways | AR Models |
 |---|---|---|---|---|---|---|---|
 | **Identity** | 13 | 10 | 8 | 8 | 0 | — | `User`, `RememberToken`, `AuditLog` |
 | **Trading** | 8 | 8 | 5 | 2 | 8 | — | `Portfolio`, `Position`, `Trade`, `PortfolioSnapshot`, `WatchlistItem`, `StockSplit` |
@@ -17,30 +17,30 @@
 | **Notifications** | 3 | 1 | 1 | 0 | 0 | — | `Notification` |
 | **Totals** | **67** | **42** | **44** | **22** | **22** | **14** | **23** |
 
-### Observaciones del inventario
+### Inventory observations
 
-- **Identity tiene 0 domain services** — lógica vive en `User` model y use cases. Inconsistente con los otros BCs (anti-pattern de "modelo gordo" o de "use case gordo").
-- **Administration tiene 23 use cases** — más que cualquier otro BC. Sospechoso: ¿es un BC con dominio propio o un layer admin transversal sobre los otros? Ver diagnosis.md.
-- **MarketData es el BC más rico** — 11 UC, 13 events, 16 handlers, 12 domain services, 14 gateways. Es el corazón del producto.
-- **Notifications es minimalista** — 3 UC, 1 event, 1 handler, 0 contracts. ¿BC real o librería? Ver diagnosis.md.
+- **Identity has 0 domain services** — logic lives in the `User` model and in use cases. Inconsistent with the other BCs (anti-pattern of "fat model" or "fat use case").
+- **Administration has 23 use cases** — more than any other BC. Suspicious: is it a BC with its own domain, or a cross-cutting admin layer over the others? See diagnosis.md.
+- **MarketData is the richest BC** — 11 UCs, 13 events, 16 handlers, 12 domain services, 14 gateways. It's the heart of the product.
+- **Notifications is minimal** — 3 UCs, 1 event, 1 handler, 0 contracts. Is it a real BC or a library? See diagnosis.md.
 
 ---
 
 ## Event subscriptions — health check
 
-**Estado:** 42 events declarados, 37 subscriptions cableadas en `config/initializers/event_subscriptions.rb`.
+**State:** 42 events declared, 37 subscriptions wired in `config/initializers/event_subscriptions.rb`.
 
-### Events zombie (publicados sin subscriber) — 7
+### Zombie events (published without subscribers) — 7
 
-1. `Identity::Events::ProfileUpdated` (publicado en `update_info.rb:8`)
-2. `Identity::Events::EmailVerified` (publicado en `verify_email.rb:8`)
-3. `MarketData::Events::AssetDeleted` (publicado en `delete_asset.rb:12`)
-4. `MarketData::Events::FxRatesRefreshed` (publicado en `refresh_fx_rates_job.rb:15`)
-5. `Administration::Events::AssetUpdated` (publicado, nadie escucha)
-6. `Administration::Events::CsvExported` (publicado, ignorado)
-7. `Alerts::Events::AlertRuleCreated` (ni publicado ni suscrito — clase fantasma)
+1. `Identity::Events::ProfileUpdated` (published in `update_info.rb:8`)
+2. `Identity::Events::EmailVerified` (published in `verify_email.rb:8`)
+3. `MarketData::Events::AssetDeleted` (published in `delete_asset.rb:12`)
+4. `MarketData::Events::FxRatesRefreshed` (published in `refresh_fx_rates_job.rb:15`)
+5. `Administration::Events::AssetUpdated` (published, nobody listens)
+6. `Administration::Events::CsvExported` (published, ignored)
+7. `Alerts::Events::AlertRuleCreated` (neither published nor subscribed — phantom class)
 
-### Events fantasma (clase declarada pero nunca publicada ni suscrita) — 4
+### Ghost events (class declared, never published or subscribed) — 4
 
 1. `Trading::Events::WatchlistItemAdded`
 2. `Trading::Events::PositionOpened`
@@ -49,18 +49,18 @@
 
 ### Hot events (≥4 subscribers) — 2
 
-- `MarketData::Events::AssetPriceUpdated` → 4 handlers (EvaluateAlerts, Broadcast, RecordPriceHistory, RecalculateTrendScore). Cualquier handler lento bloquea o multiplica latencia; verificar `async?` por handler.
-- `Identity::Events::UserRegistered` → 4 handlers. Orden importa (Portfolio antes que AlertPreferences) y no está garantizado.
+- `MarketData::Events::AssetPriceUpdated` → 4 handlers (EvaluateAlerts, Broadcast, RecordPriceHistory, RecalculateTrendScore). Any slow handler blocks or multiplies latency; verify `async?` per handler.
+- `Identity::Events::UserRegistered` → 4 handlers. Order matters (Portfolio before AlertPreferences) and isn't guaranteed.
 
-**Total a limpiar:** **11 events** (7 zombie + 4 fantasma).
+**Total to clean up:** **11 events** (7 zombie + 4 ghost).
 
 ---
 
-## Use cases triviales (anti-pattern #3) — top 10
+## Trivial use cases (anti-pattern #3) — top 10
 
-Todos: andamio `ApplicationUseCase` + `Success/Failure` para 2-5 líneas reales.
+All: `ApplicationUseCase` scaffolding + `Success/Failure` for 2-5 real lines.
 
-| # | Path | Líneas | Operación real |
+| # | Path | Lines | Real operation |
 |---|---|---|---|
 | 1 | `identity/use_cases/load_asset_catalog.rb` | 13 | `Asset.where(...).order.limit` — 1 query |
 | 2 | `identity/use_cases/load_progress.rb` | 13 | `user.watchlist_items.count` |
@@ -68,21 +68,21 @@ Todos: andamio `ApplicationUseCase` + `Success/Failure` para 2-5 líneas reales.
 | 4 | `notifications/use_cases/list_recent.rb` | 15 | 2 scopes |
 | 5 | `trading/use_cases/load_asset_trend.rb` | 15 | 1 `find_by` + 2 reads |
 | 6 | `alerts/use_cases/update_preferences.rb` | 14 | `pref.update!(params.slice(...))` |
-| 7 | `alerts/use_cases/toggle_rule.rb` | 19 | flip enum + `update!` |
+| 7 | `alerts/use_cases/toggle_rule.rb` | 19 | enum flip + `update!` |
 | 8 | `alerts/use_cases/destroy_rule.rb` | 19 | `find_by` + `destroy!` |
 | 9 | `trading/use_cases/remove_from_watchlist.rb` | 19 | `find_by` + `destroy!` |
-| 10 | `administration/use_cases/assets/toggle_status.rb` | 17 | flip enum + `update!` |
+| 10 | `administration/use_cases/assets/toggle_status.rb` | 17 | enum flip + `update!` |
 
 Bonus: `notifications/use_cases/mark_as_read.rb` (18L), `administration/use_cases/integrations/refresh_sync.rb:10` (enqueue 1 job), `identity/use_cases/global_search.rb` (3 ILIKE queries).
 
 ---
 
-## Features visibles agrupadas por surface
+## User-visible features grouped by surface
 
 ### Dashboard (`/dashboard`)
-- Patrimonio Total KPI, Buying Power, Day Gain/Loss, Market Sentiment
+- Total Patrimony KPI, Buying Power, Day Gain/Loss, Market Sentiment
 - Watchlist Performance table
-- Próximos eventos (CETES + earnings)
+- Upcoming events (CETES + earnings)
 - Weekly Insight card
 - AI Insight card (Phase 22.1)
 - News feed (lazy frame)
@@ -91,24 +91,24 @@ Bonus: `notifications/use_cases/mark_as_read.rb` (18L), `administration/use_case
 - Market indices card + sparklines
 
 ### Market (`/market`)
-- Market listings table con filters (sector, market cap, volatility, trend strength)
+- Market listings table with filters (sector, market cap, volatility, trend strength)
 - TrendScore breakdown tooltip
 - Pagination
 - Asset detail page (`/market/:symbol`)
-- 7 tabs para stocks: Summary, Income Statement, Balance Sheet, Cash Flow, Trends, Earnings, AI Health
-- 2 tabs para crypto: Summary, Market Data
+- 7 tabs for stocks: Summary, Income Statement, Balance Sheet, Cash Flow, Trends, Earnings, AI Health
+- 2 tabs for crypto: Summary, Market Data
 - TradingView Advanced Chart widget (lazy)
 
 ### Portfolio (`/portfolio`)
-- Total Portfolio Value KPI (con domestic vs international breakdown — sospechoso)
-- Donut chart de allocation (sector + asset type, tabs)
+- Total Portfolio Value KPI (with domestic vs international breakdown — suspicious)
+- Allocation donut chart (sector + asset type, tabs)
 - Tabs: Open Positions / Closed Positions / Dividends
 - Period returns pills (1D/1W/1M/3M/6M/1Y/YTD/ALL)
-- SVG performance chart con benchmark overlay (S&P/NASDAQ/Dow)
+- SVG performance chart with benchmark overlay (S&P/NASDAQ/Dow)
 - Risk Metrics section (Volatility, Sharpe, Max Drawdown)
 - Concentration risk badge
-- Trade entry form inline
-- Trade edit (con 30-day guard) y soft delete
+- Inline trade entry form
+- Trade edit (with 30-day guard) and soft delete
 
 ### Alerts (`/alerts`)
 - Active rules table
@@ -119,11 +119,11 @@ Bonus: `notifications/use_cases/mark_as_read.rb` (18L), `administration/use_case
 ### Earnings (`/earnings`)
 - Calendar grid (month view)
 - Watchlist priority sidebar
-- Earnings detail page (`/earnings/:id`) con EPS chart, beat/miss icons
+- Earnings detail page (`/earnings/:id`) with EPS chart, beat/miss icons
 
 ### News (`/news`)
-- Article feed con sentiment badges (LLM)
-- Filtros: All / Stocks / Crypto / Economy
+- Article feed with sentiment badges (LLM)
+- Filters: All / Stocks / Crypto / Economy
 - Watchlist filter
 
 ### Profile (`/profile`)
@@ -133,16 +133,16 @@ Bonus: `notifications/use_cases/mark_as_read.rb` (18L), `administration/use_case
 
 ### Admin (`/admin/*`)
 - Assets CRUD, search ticker, manual sync
-- Logs viewer con filters, auto-refresh, CSV export
+- Logs viewer with filters, auto-refresh, CSV export
 - Users management (suspend, reactivate, delete)
-- Integrations cards con rate limit bars, API Key Pool
+- Integrations cards with rate limit bars, API Key Pool
 - System Health (Solid Queue, Solid Cache, Circuit Breakers)
 - Settings (SiteConfig)
 
 ### Public
-- `/` landing con fake stats + fake testimonials + fake institutions
-- `/trends` Trend Explorer público
-- `/open-source` página
+- `/` landing with fake stats + fake testimonials + fake institutions
+- `/trends` public Trend Explorer
+- `/open-source` page
 - `/privacy`, `/terms`, `/risk-disclosure` legal
 - `/login`, `/register`, `/forgot-password`
 
@@ -151,70 +151,70 @@ Bonus: `notifications/use_cases/mark_as_read.rb` (18L), `administration/use_case
 ## View components inventory
 
 `app/views/components/`:
-- `_stat_card.html.erb` — KPI con change badge (dashboard)
-- `_admin_kpi_card.html.erb` — KPI con color_map (admin) — **duplicado** con `_stat_card`
-- `_empty_state.html.erb` — ✅ bien diseñado, 4 variants
-- `_skeleton.html.erb` — ✅ 4 variants (text/card/stat_card/table_row), subutilizado
+- `_stat_card.html.erb` — KPI with change badge (dashboard)
+- `_admin_kpi_card.html.erb` — KPI with color_map (admin) — **duplicated** with `_stat_card`
+- `_empty_state.html.erb` — ✅ well designed, 4 variants
+- `_skeleton.html.erb` — ✅ 4 variants (text/card/stat_card/table_row), underused
 - `_status_badge.html.erb`
 - `_data_table.html.erb`
 
 `app/views/shared/`:
 - `_flash.html.erb` (loop)
-- `_flash_message.html.erb` (item) — usa `bg-green-50/bg-red-50` hardcoded en vez de tokens
+- `_flash_message.html.erb` (item) — uses hardcoded `bg-green-50/bg-red-50` instead of tokens
 - `_navbar.html.erb`
 - `_breadcrumb.html.erb`
-- `_asset_badge.html.erb` — ✅ consistente
-- `_sparkline.html.erb` — ✅ consistente
-- `_donut_chart.html.erb` — ✅ consistente
+- `_asset_badge.html.erb` — ✅ consistent
+- `_sparkline.html.erb` — ✅ consistent
+- `_donut_chart.html.erb` — ✅ consistent
 
 ---
 
-## Designs folder — abandonados
+## Designs folder — abandoned
 
-Workflow `designs/wip/PROCESSING.md` exige `screen.png + code.html + SPEC.md`. Estado:
+The `designs/wip/PROCESSING.md` workflow requires `screen.png + code.html + SPEC.md`. Current state:
 
-| Folder | Archivos | SPEC.md | Implementado | Recomendación |
+| Folder | Files | SPEC.md | Implemented | Recommendation |
 |---|---|---|---|---|
-| `aapl_statements_tab_-_stockerly/` | screen.png, code.html | ❌ | Sí → `market/_statements_tab.html.erb` | Cerrar/archivar |
-| `detalle_de_asset_-_aapl/` | screen.png, code.html | ❌ | Sí parcial → `market/show.html.erb` | Cerrar/archivar (divergió) |
-| `stockerly_-_adaptive_metrics/` | screen.png, code.html | ❌ | No encontrado en views | Decidir: retomar o eliminar |
-| `stockerly_-_tooltip_component_detail/` | screen.png, code.html | ❌ | No (solo trend-breakdown inline) | Retomar — tooltip reutilizable útil |
+| `aapl_statements_tab_-_stockerly/` | screen.png, code.html | ❌ | Yes → `market/_statements_tab.html.erb` | Close/archive |
+| `detalle_de_asset_-_aapl/` | screen.png, code.html | ❌ | Partial → `market/show.html.erb` | Close/archive (diverged) |
+| `stockerly_-_adaptive_metrics/` | screen.png, code.html | ❌ | Not found in views | Decide: resume or eliminate |
+| `stockerly_-_tooltip_component_detail/` | screen.png, code.html | ❌ | No (only trend-breakdown inline) | Resume — reusable tooltip useful |
 
 ---
 
-## Counts crudos (UI/CSS)
+## Raw counts (UI/CSS)
 
-| Métrica | Count | Interpretación |
+| Metric | Count | Interpretation |
 |---|---|---|
-| `text-slate-*` en views | **884** | Saturación de slate; ignora `secondary: #1E293B` del brand |
-| Hex hardcoded inline en views | **46** | Mayoría en charts SVG (acceptable) + F&G gradients (re-tokenizable) |
-| `text-emerald/rose/amber/violet` | **189** | Sistema semántico paralelo no-tokenizado |
-| `bg-success/error/warning/info` (tokens semánticos) | **0** | **Cero uso del design system semántico** definido en `@theme` |
-| `font-display`, `font-body` clases | **0** (`font-mono` 10x) | Plus Jakarta Sans cargado pero nunca aplicado via clase |
+| `text-slate-*` in views | **884** | Slate saturation; ignores `secondary: #1E293B` from the brand |
+| Inline hardcoded hex in views | **46** | Mostly in SVG charts (acceptable) + F&G gradients (re-tokenizable) |
+| `text-emerald/rose/amber/violet` | **189** | Parallel non-tokenized semantic system |
+| `bg-success/error/warning/info` (semantic tokens) | **0** | **Zero use of the semantic design system** defined in `@theme` |
+| `font-display`, `font-body` classes | **0** (`font-mono` 10x) | Plus Jakarta Sans loaded but never applied via class |
 
 ---
 
-## LLM Phase 22 — system prompts auditados
+## LLM Phase 22 — system prompts audited
 
-| File | Status ADR-001 |
+| File | ADR-001 status |
 |---|---|
 | `insight_generator.rb:8-14` | ✅ "Never recommend buying, selling, or any specific action" |
-| `fundamental_health_check.rb:8-13` | ✅ mismo guardrail |
-| `earnings_narrative_generator.rb:10-15` | ✅ mismo guardrail |
-| `news_sentiment_analyzer.rb:10-14` | ⚠️ usa "bullish/bearish/neutral" — view `_news_card.html.erb` acepta también "positive/negative" — drift de vocabulario |
+| `fundamental_health_check.rb:8-13` | ✅ same guardrail |
+| `earnings_narrative_generator.rb:10-15` | ✅ same guardrail |
+| `news_sentiment_analyzer.rb:10-14` | ⚠️ uses "bullish/bearish/neutral" — view `_news_card.html.erb` also accepts "positive/negative" — vocabulary drift |
 
-**Falta:** validación de output del LLM contra blacklist de verbos. El guardrail del prompt es esperanza, no garantía.
+**Missing:** LLM output validation against verb blacklist. The prompt guardrail is hope, not guarantee.
 
 ---
 
-## Asset types presentes
+## Asset types present
 
-Por convención del schema y código actual:
-- `equity` (stocks NYSE/NASDAQ)
+By schema convention and current code:
+- `equity` (NYSE/NASDAQ stocks)
 - `etf`
 - `crypto`
-- `cetes` (instrumento mexicano)
-- `index` (S&P, NASDAQ, Dow, IPC, VIX, FTSE — no transables)
-- `forex` (FX rates como assets — sospechoso)
+- `cetes` (Mexican instrument)
+- `index` (S&P, NASDAQ, Dow, IPC, VIX, FTSE — not tradable)
+- `forex` (FX rates as assets — suspicious)
 
-**Asset.currency no existe** — la moneda es implícita por convención de símbolo (`CETES_*D` → MXN, todo lo demás → USD asumido).
+**Asset.currency does not exist** — the currency is implicit by symbol convention (`CETES_*D` → MXN, anything else → assumed USD).

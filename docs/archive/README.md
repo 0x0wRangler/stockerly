@@ -1,69 +1,69 @@
-# Archivo histórico — Stockerly
+# Historical archive — Stockerly
 
-> ⚠️ **Lo que está aquí NO es fuente de verdad del proyecto actual.**
-> Se conserva por valor histórico y como referencia de cómo evolucionó Stockerly. Si una decisión actual contradice algo aquí, **manda la decisión actual** (en `docs/vision/` o `docs/architecture/adr/`).
-
----
-
-## Por qué archivamos en lugar de borrar
-
-1. **Historia del producto.** Las 22 fases completadas entre Phase 0 y Phase 22 tienen valor como evidencia de aprendizaje y como audit trail.
-2. **Referencia técnica.** Algunos detalles (modelado de BD, comandos antiguos) pueden ser útiles al hacer code audit o entender por qué algo es como es.
-3. **Portfolio público.** Mostrar el journey (incluyendo correcciones) es más valioso que mostrar solo el estado final.
+> ⚠️ **What's here is NOT the current source of truth.**
+> Preserved for historical value and as reference for how Stockerly evolved. If a current decision contradicts something here, **the current decision wins** (in `docs/vision/` or `docs/architecture/adr/`).
 
 ---
 
-## Contenido
+## Why we archive instead of delete
+
+1. **Product history.** The 22 phases completed between Phase 0 and Phase 22 have value as evidence of learning and as audit trail.
+2. **Technical reference.** Some details (DB modeling, old commands) may be useful during code audits or when understanding why something is the way it is.
+3. **Public portfolio.** Showing the journey (including corrections) is more valuable than showing only the final state.
+
+---
+
+## Contents
 
 ### `spec-2026-Q1/`
 
-Especificaciones aspiracionales del proyecto al cierre de Q1 2026 (justo antes del reset del 2026-05-14):
+Aspirational project specifications at Q1 2026 close (just before the 2026-05-14 reset):
 
-| Archivo | Por qué se archivó |
+| File | Why it was archived |
 |---|---|
-| `PRD.md` | Describía 3 personas (trader activo, inversionista casual, admin) cuando el usuario real es uno. Reemplazado por `docs/vision/audience.md` y `docs/vision/jobs-to-be-done.md`. |
-| `TECHNICAL_SPEC.md` | Spec técnica de 684 líneas con detalle de routes/layouts/partials/Stimulus controllers — mezclaba arquitectura con detalle de implementación. Lo arquitectural vivo está en `docs/architecture/`. Lo de implementación está en el código. |
-| `COMMANDS.md` | Catálogo aspiracional de 2163 líneas con use cases, events, gateways. Estaba desincronizado con el código real (60 use cases catalogados vs 68 reales). Reemplazado por READMEs por bounded context (a crear en sprints siguientes) y por el código mismo como fuente. |
-| `DATABASE_SCHEMA.md` | Modelado de BD de 1345 líneas. La fuente de verdad real es `db/schema.rb`. Mantener un doc paralelo era doc bloat. |
-| `EXPERTS-v1.md` | Panel de expertos en lista plana de 10. Reemplazado por `docs/research/experts.md` (8 Core + 8 Situational con triggers y operating rules). |
+| `PRD.md` | Described 3 personas (active trader, casual investor, admin) when the real user is one. Replaced by `docs/vision/audience.md` and `docs/vision/jobs-to-be-done.md`. |
+| `TECHNICAL_SPEC.md` | 684-line tech spec detailing routes/layouts/partials/Stimulus controllers — mixed architecture with implementation detail. Live architectural content is in `docs/architecture/`. Implementation detail belongs in the code. |
+| `COMMANDS.md` | 2163-line aspirational catalog of use cases, events, gateways. It was out of sync with real code (60 use cases cataloged vs 68 actual). Replaced by per-bounded-context READMEs (to be created in future sprints) and by the code itself as source. |
+| `DATABASE_SCHEMA.md` | 1345-line DB modeling. The real source of truth is `db/schema.rb`. Maintaining a parallel doc was doc bloat. |
+| `EXPERTS-v1.md` | Flat list of 10 experts. Replaced by `docs/research/experts.md` (8 Core + 8 Situational with triggers and operating rules). |
 
 ### `roadmap-phases-1-22.md`
 
-Antes vivía en la raíz como `ROADMAP.md`. Es el registro cronológico de las 22 fases completadas hasta el 2026-05-14. **No es roadmap futuro** — es history log. El roadmap actual vive en GitHub (milestones del proyecto).
+Previously lived at the root as `ROADMAP.md`. It's the chronological record of the 22 phases completed through 2026-05-14. **It is not a future roadmap** — it's a history log. The current roadmap lives in GitHub (project milestones).
 
 ---
 
-## Cómo se traduce algo del archivo a la realidad actual
+## How to translate something from the archive to current reality
 
-| Si encuentras en archivo... | Su equivalente actual es... |
+| If you find in archive... | Its current equivalent is... |
 |---|---|
-| PRD "F-001: Landing Page" | Decisión 2026-05-14: no hay landing comercial. Ver `docs/vision/non-goals.md`. |
-| PRD "F-013: Mi Perfil con avatar editable" | Vivo en código, audit pendiente Sprint 1 Paso 6 |
-| COMMANDS.md "Identity::Register" | Código real en `app/contexts/identity/use_cases/register.rb` |
-| COMMANDS.md catálogos de eventos | `config/initializers/event_subscriptions.rb` es la fuente real |
-| TECHNICAL_SPEC "Bounded Contexts" | `docs/architecture/README.md` (mapa actualizado) |
+| PRD "F-001: Landing Page" | Decision 2026-05-14: no commercial landing. See `docs/vision/non-goals.md`. |
+| PRD "F-013: My Profile with editable avatar" | Live in code; audit pending Sprint 1 Step 6 |
+| COMMANDS.md "Identity::Register" | Real code in `app/contexts/identity/use_cases/register.rb` |
+| COMMANDS.md event catalogs | `config/initializers/event_subscriptions.rb` is the real source |
+| TECHNICAL_SPEC "Bounded Contexts" | `docs/architecture/README.md` (updated map) |
 | EXPERTS-v1 "QA Engineer" | EXPERTS-v2 (`docs/research/experts.md`) S8 Mehmet Karadeniz |
-| ROADMAP "Phase 23 — TBD" | No existe. Sprint 1 reemplaza el modelo de "fases" por sprints con discovery cards. |
+| ROADMAP "Phase 23 — TBD" | Doesn't exist. Sprint 1 replaces the "phases" model with sprints anchored to discovery cards. |
 
 ---
 
-## Cómo se agrega algo al archivo
+## How to add something to the archive
 
-Cuando un documento de `docs/` deja de reflejar la realidad y se reemplaza por otro:
+When a document in `docs/` stops reflecting reality and is replaced by another:
 
-1. Mover a `docs/archive/<categoria>-<periodo>/`
-2. Agregar nota al final del README de archive explicando por qué
-3. Buscar referencias al doc viejo y actualizarlas (grep)
-4. Commit con razón explícita
+1. Move it to `docs/archive/<category>-<period>/`
+2. Add a note at the end of this archive README explaining why
+3. Search for references to the old doc and update them (grep)
+4. Commit with explicit reason
 
 ---
 
-## Cómo se elimina algo del archivo
+## How to delete something from the archive
 
-Cuando un documento histórico deja de tener valor de referencia:
+When a historical document stops having reference value:
 
-- Después de 1+ año sin consulta (audit trimestral)
-- Si su contenido fue migrado completamente a docs vivos
-- Si compromete portfolio público (ej. menciona credenciales reales)
+- After 1+ year without consultation (quarterly audit)
+- If its content was fully migrated to live docs
+- If it compromises the public portfolio (e.g., mentions real credentials)
 
-→ borrar en commit explícito con razón. Git history lo preserva igual.
+→ delete in an explicit commit with the reason. Git history preserves it anyway.
