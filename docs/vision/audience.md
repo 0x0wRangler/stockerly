@@ -46,7 +46,7 @@
 - Support beyond "it broke, tell me and we'll see"
 
 **Hypotheses to validate with the beta (not assumed):**
-- H1: Friends share at least 3 of the primary user's 5 JTBDs.
+- H1: Friends share at least 3 of the primary user's 6 JTBDs.
 - H2: An interface written in es-MX (not translated from English) reduces friction.
 - H3: Something concrete keeps them coming back beyond initial novelty — *what exactly remains to be discovered*.
 
