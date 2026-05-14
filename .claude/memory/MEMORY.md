@@ -16,3 +16,4 @@
 - [My anti-patterns](feedback_anti_patterns.md) — 7 enforcement targets from 22-phase retrospective
 - [No co-author attribution](feedback_no_coauthor.md) — Never add Co-Authored-By or AI attribution to commits/issues/PRs
 - [Repo artifacts in English](feedback_repo_language_english.md) — Chat in Spanish, commits/issues/docs in English
+- [Readable code, minimal comments](feedback_readable_code.md) — Self-explanatory code first; comments only for non-obvious why, one short line
