@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Stockerly is a fintech platform for market trends, portfolios, alerts, and earnings built with Rails 8.1.2, PostgreSQL 16, Hotwire, and Tailwind CSS 4. It uses a pragmatic DDD + Hexagonal Architecture with 5 Bounded Contexts: Identity, Trading (includes Watchlist), Alerts, Market Data, Administration.
+Stockerly is a fintech platform for market trends, portfolios, alerts, and earnings built with Rails 8.1.2, PostgreSQL 16, Hotwire, and Tailwind CSS 4. It uses a pragmatic DDD + Hexagonal Architecture with 6 Bounded Contexts: Identity, Trading (includes Watchlist), Alerts, Market Data, Administration, Notifications.
 
 100% open source — no pricing tiers, no premium features.
 
