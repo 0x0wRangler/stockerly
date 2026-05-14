@@ -16,6 +16,13 @@
 3. *Cuando un CETE está por vencer, quiero saberlo con 7 días de anticipación, para decidir reinvertir.*
 4. *Cuando entra earnings de algo que tengo, quiero saberlo con 2 días de anticipación, para no enterarme después.*
 5. *Cuando agrego un trade nuevo, quiero capturarlo en menos de 30 segundos, para no abandonar el registro por flojera.*
+6. *Cuando una de mis posiciones (o un activo de mi watchlist) entra en zona técnica notable (oversold/overbought según RSI, ruptura de Bollinger Bands, cruce de medias móviles), quiero verlo descrito en contexto, para incluirlo en mi reflexión semanal de portafolio.*
+
+**Restricción de lenguaje del producto (ADR-001 pendiente de redacción formal):**
+- Stockerly habla en lenguaje descriptivo: *"AAPL aparece oversold según RSI(14)"*.
+- Stockerly NO habla en lenguaje prescriptivo: *"compra AAPL"*, *"considera vender"*, *"buen momento para..."*.
+- Indicadores técnicos, scores compuestos (TrendScore, F&G), interpretaciones de estado ("oversold", "overbought", "ruptura") son válidos.
+- Predicciones probabilísticas y recomendaciones de acción quedan fuera.
 
 **Lo que explícitamente NO está en scope (decidido 2026-05-14):**
 - ❌ Reportes fiscales (ISR, declaración, retención de dividendos, ganancia cambiaria fiscal)
