@@ -230,4 +230,3 @@ Follow `CONTRIBUTING.md` conventions:
 | Brand System | `docs/branding/BRANDING.md` |
 | AI Identity & Principles | `IDENTITY.md` |
 | Contributing Guide | `CONTRIBUTING.md` |
-| Design Processing | `designs/wip/PROCESSING.md` |
