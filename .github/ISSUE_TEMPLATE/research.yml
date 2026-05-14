@@ -1,0 +1,51 @@
+name: Research / Discovery
+description: Open question to investigate before committing to scope.
+title: "[research] "
+labels: ["triage", "research", "discovery-needed"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Research / Discovery
+        Use this when there's an open question that needs investigation before a feature/refactor can be scoped. Output: a decision (often an ADR) plus a Feature issue if implementation follows.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Pregunta abierta
+      description: What needs to be answered before we can proceed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: ¿Por qué importa ahora?
+      description: What forces this question? What's blocked or at risk if we don't answer?
+    validations:
+      required: true
+
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hipótesis inicial (si tienes)
+
+  - type: textarea
+    id: closure_criteria
+    attributes:
+      label: Criterio para cerrar este research
+      description: |
+        How will we know the question is answered?
+      placeholder: |
+        - [ ] ADR-XXX written documenting the decision
+        - [ ] Feature issue created (or rejected with reason)
+    validations:
+      required: true
+
+  - type: textarea
+    id: experts
+    attributes:
+      label: Expertos a consultar
+      description: |
+        From the panel in `docs/research/experts.md`. By name or role.
+      placeholder: "C1 Lucía (financial), C6 Esther (scope), ..."

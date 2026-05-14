@@ -1,0 +1,61 @@
+name: Bug
+description: Report a defect that breaks or degrades an existing JTBD.
+title: "[bug] "
+labels: ["triage", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug report
+        Use this for reproducible defects in existing functionality. For "I think we should add X", use Feature instead.
+
+        **⚠️ Repo is public.** Do NOT include real position amounts, account numbers, or personal financial data. Use synthetic examples ("my AAPL position of 100 shares" not "my $X position").
+
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: Qué pasó
+      description: Specific behavior observed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Qué esperabas
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Pasos para reproducir
+      description: Minimal steps.
+      placeholder: |
+        1. Open /portfolio
+        2. Click on "Add Trade"
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: jtbd_affected
+    attributes:
+      label: ¿Qué JTBD afecta? (1-6 o "infra")
+      placeholder: "JTBD #1 (patrimonio consolidado MXN)"
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - "P0 — blocks beta or breaks core JTBD"
+        - "P1 — degrades JTBD significantly"
+        - "P2 — minor / cosmetic"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (browser, device, anything relevant)
