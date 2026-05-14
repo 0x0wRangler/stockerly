@@ -65,12 +65,12 @@ Write a SPEC.md for the page with:
 
 ### 5. Expert review
 
-Consult relevant experts from `docs/spec/EXPERTS.md`:
+Consult relevant experts from `docs/research/experts.md`:
 
 ```
 Review the design for [PAGE] (designs/{zone}/{page}/screen.png) against:
 1. The page SPEC.md
-2. The PRD requirements (docs/spec/PRD.md)
+2. The vision requirements (docs/vision/jobs-to-be-done.md)
 3. Relevant expert profiles
 
 Evaluate:
@@ -83,10 +83,9 @@ Evaluate:
 ### 6. Update specification docs
 
 If the new design introduces changes, update:
-- `docs/spec/PRD.md` — Add Feature ID if needed
-- `docs/spec/COMMANDS.md` — Add Use Cases / Events if needed
-- `docs/spec/DATABASE_SCHEMA.md` — Add models if needed
-- `docs/spec/TECHNICAL_SPEC.md` — Add Stimulus controllers / Turbo config if needed
+- `docs/vision/jobs-to-be-done.md` — Add JTBD if a new one is justified
+- `docs/architecture/adr/` — Add ADR if architectural decision is involved
+- GitHub Issue — Create discovery card for the new screen's backlog item
 
 ### 7. Clean up WIP
 

@@ -4,8 +4,8 @@ description: Stockerly virtual expert panel inspired by Mi Feria model. 8 Core c
 type: project
 ---
 
-**Lives at:** `docs/research/experts.md` (to be created in Sprint 1 Step 4)
-**Replaces:** `docs/spec/EXPERTS.md` (flat list of 10, to be archived)
+**Lives at:** `docs/research/experts.md` (created Sprint 1 Step 4)
+**Replaces:** `docs/spec/EXPERTS.md` (flat list of 10, archived at `docs/archive/spec-2026-Q1/EXPERTS-v1.md`)
 
 **Core (8 — consulted on any relevant work):**
 

@@ -181,32 +181,28 @@ Stockerly deploys to any Linux server using **Kamal 2** with Docker.
 
 The reference deployment uses Hetzner VPS + Cloudflare Tunnel (no inbound ports needed).
 
-See [docs/DEPLOY.md](docs/DEPLOY.md) for the complete deployment guide.
+See [docs/ops/deploy.md](docs/ops/deploy.md) for the complete deployment guide.
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
+| [docs/](docs/) | Documentation index (vision, architecture, ops, archive) |
+| [docs/vision/](docs/vision/) | Product north, audience, JTBDs, non-goals |
+| [docs/architecture/](docs/architecture/) | Bounded contexts map + ADRs |
+| [docs/ops/deploy.md](docs/ops/deploy.md) | Production deployment guide |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution model (currently closed beta — no external PRs until v1.0) |
 | [RELEASING.md](RELEASING.md) | Versioning and release process |
 | [SECURITY.md](SECURITY.md) | Security policy and vulnerability reporting |
 | [CLAUDE.md](CLAUDE.md) | Architecture reference (DDD, bounded contexts, conventions) |
-| [ROADMAP.md](ROADMAP.md) | Development roadmap and phase history |
-| [docs/DEPLOY.md](docs/DEPLOY.md) | Production deployment guide |
-| [docs/spec/PRD.md](docs/spec/PRD.md) | Product Requirements Document |
-| [docs/spec/DATABASE_SCHEMA.md](docs/spec/DATABASE_SCHEMA.md) | Database schema reference |
-| [docs/spec/COMMANDS.md](docs/spec/COMMANDS.md) | Use Cases catalog (DDD) |
+| [docs/archive/](docs/archive/) | Historical specs (NOT current source of truth) |
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Stockerly is currently in **closed beta** (≤20 invited users). External PRs are not accepted until v1.0. See [docs/vision/audience.md](docs/vision/audience.md) for the audience model.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Run the tests (`bundle exec rspec`)
-4. Commit your changes
-5. Open a Pull Request
+If you find a bug or have a question, open an [issue](https://github.com/rodacato/stockerly/issues).
 
 ## Gallery
 

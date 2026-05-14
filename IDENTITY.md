@@ -192,7 +192,7 @@ Si una consulta cambia rumbo significativo del proyecto → ADR. Sin ADR, la dec
 | **Panel de Expertos** | `docs/research/experts.md` | A crear en Paso 4 del Sprint 1 |
 | **Sprint protocol** | `docs/sprints/README.md` | A crear en Paso 8 del Sprint 1 |
 | **Memoria persistente** | [`.claude/memory/`](.claude/memory/) | User profile, decisiones, anti-patterns |
-| **Deployment** | [`docs/DEPLOY.md`](docs/DEPLOY.md) | Guía de Kamal + Cloudflare |
+| **Deployment** | [`docs/ops/deploy.md`](docs/ops/deploy.md) | Guía de Kamal + Cloudflare |
 | **Diseños en proceso** | [`designs/wip/PROCESSING.md`](designs/wip/PROCESSING.md) | Workflow Stitch (rediseño cerrado al sprint) |
 
 ### Documentos archivados (NO son fuente de verdad)

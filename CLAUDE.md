@@ -222,12 +222,11 @@ Follow `CONTRIBUTING.md` conventions:
 
 | Doc | Path |
 |-----|------|
-| Product Requirements | `docs/spec/PRD.md` |
-| Technical Spec | `docs/spec/TECHNICAL_SPEC.md` |
-| Database Schema | `docs/spec/DATABASE_SCHEMA.md` |
-| Use Cases Catalog | `docs/spec/COMMANDS.md` |
-| Expert Profiles | `docs/spec/EXPERTS.md` |
-| Deployment Guide | `docs/DEPLOY.md` |
+| Vision (norte + audience + JTBDs + non-goals) | `docs/vision/` |
+| Architecture map + ADRs | `docs/architecture/` |
+| Expert Panel v2 (8 Core + 8 Situational) | `docs/research/experts.md` |
+| Deployment Guide | `docs/ops/deploy.md` |
+| Archived specs (NOT current source of truth) | `docs/archive/` |
 | Brand System | `docs/branding/BRANDING.md` |
 | AI Identity & Principles | `IDENTITY.md` |
 | Contributing Guide | `CONTRIBUTING.md` |
