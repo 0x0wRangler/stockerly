@@ -1,7 +1,10 @@
 ---
-name: Stockerly working method
-description: Source-of-truth split (GitHub for state-ful work, docs/ for evergreen). Sprint protocol with mandatory QA + retro. Discovery card required for every feature.
-type: project
+name: stockerly-working-method
+description: "Source-of-truth split (GitHub for state-ful work, docs/ for evergreen). Sprint protocol with mandatory QA + retro. Discovery card required for every feature."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 9f04b1ac-0e2c-4edc-ba38-a17f9bcf8927
 ---
 
 **Source of truth split (UNA fuente por tipo, nunca duplicar):**
@@ -21,11 +24,11 @@ type: project
 | **Bugs from beta** | **GitHub Issues** |
 
 **Sprint protocol:**
-- Duration: 1-2 weeks (default 1 week)
-- Goal: single sentence in milestone description
+- **Effort metric:** Claude session-hours (not calendar days). Sprint 1 was ~10-12h, Sprint 2 estimated ~20-25h. Calendar target is orientativo. Close trigger is QA + retro, not the date. Decided 2026-05-14 — Adrian works evenings/weekends with intense paired sessions, so calendar duration varies wildly while session-hours are comparable across sprints.
+- Goal: single sentence in milestone description, also in `docs/sprints/<n>/GOAL.md` (referenced from milestone, not duplicated)
 - QA pass MANDATORY before close (manual smoke test, audit script, CI green, design audit)
 - Retro post-close required (`docs/sprints/<n>/retro.md` — what worked / what didn't / what to change)
-- No new sprint while previous sprint open
+- No new sprint while previous sprint open (hard rule)
 - Max 7 issues "In Progress" simultaneously; if exceeded, stop opening new and close existing
 
 **Discovery card (mandatory for every feature, via GH issue template):**
