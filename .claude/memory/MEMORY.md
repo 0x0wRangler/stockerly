@@ -14,3 +14,4 @@
 ## Feedback
 - [Brutal honesty mandate](feedback_brutal_honesty.md) — Adrian's explicit ask, applies to all responses
 - [My anti-patterns](feedback_anti_patterns.md) — 7 enforcement targets from 22-phase retrospective
+- [No co-author attribution](feedback_no_coauthor.md) — Never add Co-Authored-By or AI attribution to commits/issues/PRs
