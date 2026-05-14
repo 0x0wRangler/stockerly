@@ -27,10 +27,7 @@ module Administration
         }.freeze
 
         def call(query:)
-          return Failure([ :validation, "Query must be at least 2 characters" ]) if query.blank? || query.strip.length < 2
-
-          gateway = MarketData::Gateways::AlphaVantageGateway.new
-          results = yield gateway.search_tickers(query.strip)
+          results = yield MarketData::UseCases::SearchTickers.call(query: query)
 
           mapped = results.map { |r| map_result(r) }
 
@@ -41,14 +38,27 @@ module Administration
 
         def map_result(result)
           region = result[:exchange]
+          country = REGION_COUNTRY_MAP[region]
 
           {
             symbol: result[:symbol],
             name: result[:name],
             asset_type: QUOTE_TYPE_MAP[result[:quote_type]] || "stock",
             exchange: region,
-            country: REGION_COUNTRY_MAP[region]
+            country: country,
+            currency: derive_currency(result[:currency], country)
           }
+        end
+
+        # Alpha Vantage SYMBOL_SEARCH usually includes currency directly. Fall back to
+        # country for the rare cases where the provider omits it. asset_type isn't a
+        # signal here because the gateway never emits CRYPTOCURRENCY or fixed_income
+        # types from a ticker search.
+        def derive_currency(provider_currency, country)
+          return provider_currency if provider_currency.present?
+          return "MXN" if country == "MX"
+
+          "USD"
         end
       end
     end
