@@ -42,7 +42,8 @@
 !/app/assets/builds/.keep
 
 # LLM / AI tool files
-.claude/
+.claude/*
+!.claude/memory/
 .cursor/
 .cursorignore
 .cursorindexingignore
