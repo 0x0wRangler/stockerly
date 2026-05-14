@@ -1,14 +1,19 @@
 ---
 name: Stockerly vision & audience
-description: Stockerly is Adrian's personal tool for MXN+USD patrimonio tracking with MX fiscal discipline. Beta cerrada (≤20 invited friends), public repo = portfolio. "PO" is discipline lens, not audience. Decided 2026-05-14.
+description: Stockerly is Adrian's personal tool for MXN+USD patrimonio tracking with correct multi-currency math. Beta cerrada (≤20 invited friends), public repo = portfolio. "PO" is discipline lens, not audience. Fiscal scope explicitly out (decided 2026-05-14).
 type: project
 ---
 
 **North star (decided 2026-05-14):**
 
-> Stockerly es la herramienta personal de Adrian para entender y operar su patrimonio invertido entre MXN y USD (mismas acciones cotizadas en USD, posiciones en MXN como CETES), con disciplina fiscal mexicana. Lo open source es portfolio público. La "lente PO" es disciplina sobre el constructor — no una audiencia.
+> Stockerly es la herramienta personal de Adrian para entender y operar su patrimonio invertido entre MXN y USD (mismas acciones cotizadas en USD, posiciones en MXN como CETES), con tracking multi-divisa correcto (TC histórico al momento del trade). Lo open source es portfolio público. La "lente PO" es disciplina sobre el constructor — no una audiencia.
 
 **Why:** Earlier PRD described "50,000+ traders, social proof, admin panel" for users that didn't exist. 22 phases produced engineering theater (LLM gateway, PWA, API key pool, risk metrics) targeting non-users. 2026-05-14 reset realigns audience to one real user + closed beta.
+
+**Explicitly OUT of scope (2026-05-14):**
+- Fiscal reports (ISR, SAT integrations, dividend retention calc, currency-gain fiscal calc)
+- Anything that prepares the user for annual declaration
+- Building toward "we replace your accountant" positioning
 
 **Audience:**
 - **Primary:** Adrian (dogfood) — MX investor, weekly cadence, fiscal-aware

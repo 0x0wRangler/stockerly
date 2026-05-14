@@ -19,7 +19,7 @@ type: project
 **P0 absoluto (BETA-BLOCKER):**
 - **File:** `app/contexts/trading/use_cases/execute_trade.rb` lines 39 and 60
 - **Issue:** `currency: "USD"` hardcoded
-- **Effect:** All downstream calculators (PortfolioRiskCalculator, TimeWeightedReturn, ConcentrationAnalyzer, gain/loss) operate on incorrect currency. For MX user with mixed MXN+USD portfolio, outputs are fiscally invalid.
+- **Effect:** All downstream calculators (PortfolioRiskCalculator, TimeWeightedReturn, ConcentrationAnalyzer, gain/loss) operate on incorrect currency. For MX user with mixed MXN+USD portfolio, consolidated gain/loss in MXN is invalid — the JTBD #1 ("patrimonio consolidado en MXN") cannot be honestly delivered until this is fixed. (Note: not framed as "fiscally invalid" because fiscal reporting is explicitly out of scope per 2026-05-14 vision decision; framed as product correctness.)
 - **Required fix scope:**
   1. Add `fx_rate_at_execution` column to `trades` table
   2. Capture TC from Banxico at trade time (use existing BanxicoGateway)
