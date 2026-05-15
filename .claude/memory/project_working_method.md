@@ -24,8 +24,9 @@ metadata:
 | **Bugs from beta** | **GitHub Issues** |
 
 **Sprint protocol:**
-- **Effort metric:** Claude session-hours (not calendar days). S1 ~10-12h, S2 ~20h, S3 ~12h (deletion-heavy), S4 ~18h (new-feature with pattern proximity). Calendar target is orientativo. Close trigger is QA + retro, not the date. Decided 2026-05-14 — Adrian works evenings/weekends with intense paired sessions, so calendar duration varies wildly while session-hours are comparable across sprints.
-- **Estimation multiplier on raw hours** (updated post-S05 with 3 data points):
+- **Effort metric:** Claude session-hours (not calendar days). S1 ~10-12h, S2 ~20h, S3 ~12h (deletion-heavy), S4 ~18h (new-feature with pattern proximity), S5 ~22h (architectural refactor), S6 ~8h (pure mechanical migration with AI editing). Calendar target is orientativo. Close trigger is QA + retro, not the date. Decided 2026-05-14 — Adrian works evenings/weekends with intense paired sessions, so calendar duration varies wildly while session-hours are comparable across sprints.
+- **Estimation multiplier on raw hours** (updated post-S06 with 4 data points):
+  - **0.5×** for pure-mechanical migration sprints with complete discovery cards + AI-accelerated editing (S06 came in at 8h vs 21h projected with 1.2× — file-by-file regex-replace work compressed dramatically)
   - **1.0×** for refactor sprints with an existing ADR (S05 came in at 22h vs 27h projected with 1.3× — design decided, only implementation remains)
   - **1.2×** for deletion-heavy sprints (S03 came in at 12h vs 25h projected with 1.5×)
   - **1.3×** for new-feature sprints with a nearby existing pattern (S04 came in at 18h vs 28h projected with 1.5×)
