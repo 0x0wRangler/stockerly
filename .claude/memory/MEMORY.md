@@ -17,3 +17,4 @@
 - [No co-author attribution](feedback_no_coauthor.md) — Never add Co-Authored-By or AI attribution to commits/issues/PRs
 - [Repo artifacts in English](feedback_repo_language_english.md) — Chat in Spanish, commits/issues/docs in English
 - [Readable code, minimal comments](feedback_readable_code.md) — Self-explanatory code first; comments only for non-obvious why, one short line
+- [PR review workflow](feedback_pr_review_workflow.md) — When asked to handle PR feedback, run the full Gemini-review loop (fetch → triage → fix → CI → push → reply inline) without asking for steps
