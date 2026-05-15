@@ -24,11 +24,16 @@ metadata:
 | **Bugs from beta** | **GitHub Issues** |
 
 **Sprint protocol:**
-- **Effort metric:** Claude session-hours (not calendar days). Sprint 1 was ~10-12h, Sprint 2 estimated ~20-25h. Calendar target is orientativo. Close trigger is QA + retro, not the date. Decided 2026-05-14 — Adrian works evenings/weekends with intense paired sessions, so calendar duration varies wildly while session-hours are comparable across sprints.
+- **Effort metric:** Claude session-hours (not calendar days). S1 ~10-12h, S2 ~20h, S3 ~12h (deletion-heavy), S4 ~18h (new-feature with pattern proximity). Calendar target is orientativo. Close trigger is QA + retro, not the date. Decided 2026-05-14 — Adrian works evenings/weekends with intense paired sessions, so calendar duration varies wildly while session-hours are comparable across sprints.
+- **Estimation multiplier on raw hours** (updated post-S04 with 2 data points):
+  - **1.2×** for deletion-heavy sprints (S03 came in at 12h vs 25h projected with 1.5×)
+  - **1.3×** for new-feature sprints with a nearby existing pattern (S04 came in at 18h vs 28h projected with 1.5×)
+  - **1.5×** reserved for greenfield work with no pattern to copy
 - Goal: single sentence in milestone description, also in `docs/sprints/<n>/GOAL.md` (referenced from milestone, not duplicated)
 - QA pass MANDATORY before close (manual smoke test, audit script, CI green, design audit)
 - Retro post-close required (`docs/sprints/<n>/retro.md` — what worked / what didn't / what to change)
 - No new sprint while previous sprint open (hard rule)
+- **Sprint cadence is user-paced, not date-paced.** S03 retro suggested a 24h cool-off between sprints as default. Evaluated 2/2 transitions (S2→S3 and S3→S4): both overrode the rule. Pattern: Adrian decides when to open the next sprint. Do not write or follow a "default cool-off" rule.
 - Max 7 issues "In Progress" simultaneously; if exceeded, stop opening new and close existing
 
 **Discovery card (mandatory for every feature, via GH issue template):**
