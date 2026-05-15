@@ -39,14 +39,27 @@ Removed `parallel` label: in S06, #37 is one of three main pieces (not a side ax
 
 ---
 
-## 2026-05-15 — Opening commit will re-baseline cross-context-leaks metric
+## 2026-05-15 — Opening commit: audit-entropy regex refined, leaks re-baselined 13 → 5
 
-Per S05 retro carry-over (A), `script/audit-entropy.sh` cross-context-leaks regex catches sanctioned `MarketData::Queries::*.call` from Trading as if they were violations. Pre-fix baseline: 13. Post-fix expected: ~0-2 (real ADR-002 violations only, if any remain).
+Per S05 retro carry-over (A), `script/audit-entropy.sh` cross-context-leaks regex was catching sanctioned `MarketData::Queries::*.call` from Trading as if they were violations.
 
-The fix is part of opening, not a separate issue, because:
-- Single ~20-line commit on a script
-- No app-code touched
-- Without the fix, the S06 retro cannot honestly compare cross-context leaks before/after — the metric is currently lying
-- S05 retro explicitly authorized "can land at S06 opening"
+**Fix:** added three exclusion patterns to the existing chain:
+- `(Context)::Queries::` — by convention, every `Queries::` namespace is the public read API
+- `(Context)::UseCases::` — by convention, every `UseCases::` namespace is the public command/read API
+- `MarketData::Domain::MarketSentiment` — single grandfathered Domain read API explicitly marked `@api public` in code
 
-The actual fix-commit count and new baseline will be captured here once the commit lands.
+**Before / After (re-baseline):**
+
+| Pattern | Pre-fix | Post-fix | Notes |
+|---|---|---|---|
+| Total cross-context-leaks count | 13 | **5** | All 8 excluded were sanctioned ADR-002 reads |
+| `MarketData::Queries::*.call` (Trading) | 4 | 0 | ADR-002 sanctioned |
+| `MarketData::UseCases::*.call` (Trading + Administration) | 2 | 0 | ADR-002 sanctioned (Trading→MD); Administration→MD treated as same pattern |
+| `MarketData::Domain::MarketSentiment.for_user` (Trading) | 1 | 0 | grandfathered, `@api public` marker |
+| `Notifications::UseCases::CreateNotification` (Alerts) | 1 | 0 | UseCases namespace = public API |
+| `publish(Identity::Events::*)` (Administration) | 3 | 3 | **ADR-005 pending** — kept counted on purpose |
+| `publish(MarketData::Events::*)` (Administration) | 2 | 2 | **ADR-005 pending** — kept counted on purpose |
+
+The 5 remaining leaks are exactly the ADR-005 future scope (Administration publishing foreign events). The script now reports zero false positives and zero false negatives against the rules currently in force.
+
+**S06 close target:** ≤5 leaks (flat). The number only drops when ADR-005 lands; that's deliberately out of S06 scope (anti-scope).

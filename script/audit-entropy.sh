@@ -26,6 +26,15 @@ FORMAT="text"
 # Heuristic: a file in app/contexts/<A>/ that mentions <B>:: where B != A (and B != one of the shared roots).
 # Self-references are excluded with explicit context-folder → PascalCase-namespace pairs
 # because the snake_case folder name (market_data) doesn't match the Ruby namespace (MarketData).
+#
+# Per ADR-002 (customer/supplier read pattern), the following are NOT leaks:
+#   - <Supplier>::Queries::*    — by convention, the public read API namespace
+#   - <Supplier>::UseCases::*   — by convention, the public command/read API namespace
+#   - <Supplier>::Domain::*     — only when the target class is explicitly marked @api public
+#     (current allowlist: MarketData::Domain::MarketSentiment — see file header comment)
+# Publishing foreign events (e.g., Administration → Identity::Events::*) IS still counted; it
+# remains a flagged pattern pending ADR-005.
+#
 # False positives possible (test fixtures, comments) — keep the regex narrow.
 leaks=$(
   grep -rEn 'Trading::|MarketData::|Alerts::|Identity::|Administration::|Notifications::' \
@@ -36,6 +45,9 @@ leaks=$(
     | grep -v -E 'app/contexts/identity/[^:]+:.*Identity::' \
     | grep -v -E 'app/contexts/administration/[^:]+:.*Administration::' \
     | grep -v -E 'app/contexts/notifications/[^:]+:.*Notifications::' \
+    | grep -v -E '(Trading|MarketData|Alerts|Identity|Administration|Notifications)::Queries::' \
+    | grep -v -E '(Trading|MarketData|Alerts|Identity|Administration|Notifications)::UseCases::' \
+    | grep -v -E 'MarketData::Domain::MarketSentiment' \
     | grep -v -E ':[0-9]+:\s*#' \
     | wc -l | tr -d ' '
 )
