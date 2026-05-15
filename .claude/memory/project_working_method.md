@@ -25,7 +25,8 @@ metadata:
 
 **Sprint protocol:**
 - **Effort metric:** Claude session-hours (not calendar days). S1 ~10-12h, S2 ~20h, S3 ~12h (deletion-heavy), S4 ~18h (new-feature with pattern proximity). Calendar target is orientativo. Close trigger is QA + retro, not the date. Decided 2026-05-14 — Adrian works evenings/weekends with intense paired sessions, so calendar duration varies wildly while session-hours are comparable across sprints.
-- **Estimation multiplier on raw hours** (updated post-S04 with 2 data points):
+- **Estimation multiplier on raw hours** (updated post-S05 with 3 data points):
+  - **1.0×** for refactor sprints with an existing ADR (S05 came in at 22h vs 27h projected with 1.3× — design decided, only implementation remains)
   - **1.2×** for deletion-heavy sprints (S03 came in at 12h vs 25h projected with 1.5×)
   - **1.3×** for new-feature sprints with a nearby existing pattern (S04 came in at 18h vs 28h projected with 1.5×)
   - **1.5×** reserved for greenfield work with no pattern to copy
