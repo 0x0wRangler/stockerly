@@ -101,9 +101,17 @@ todos=$(
 # migration to a @theme semantic token (success / error / warning / info /
 # primary). Tracked as part of #37 (S3 → S6 incremental migration); must
 # decrease each sprint.
+#
+# Excludes:
+#   - slate-* (neutral track, accepted noise)
+#   - border-{l,r,t,b,x,y}-N — Tailwind border-direction WIDTH utilities
+#     (e.g. `border-l-4`), not color classes. The regex above is greedy and
+#     matches these by mistake; without the exclusion the count over-reports
+#     by ~9 hits on the current codebase. Caught in S06 #37 review.
 hardcoded_color_classes=$(
   grep -rEn '(bg|text|border)-[a-z]+-[0-9]+' app/views/ 2>/dev/null \
     | grep -v -E '(bg|text|border)-slate-[0-9]+' \
+    | grep -v -E 'border-[lrtbxy]-[0-9]+' \
     | wc -l | tr -d ' '
 )
 
