@@ -63,10 +63,15 @@ hardcoded_usd=$(
 
 # 3. ADR-001 violations in views: prescriptive verbs that should not appear.
 # See docs/architecture/adr/0001-descriptive-not-prescriptive-language.md
+# Excludes app/views/legal/ — that copy is regulatory boilerplate (risk disclosure,
+# terms, privacy) where "you should" is mandated phrasing for risk warnings, not
+# product-level investment advice.
+# `|| true` on each grep so a zero-match doesn't trip `set -o pipefail`.
 adr001_violations=$(
-  grep -rEin \
-    'recommend|suggest|you should|consider buying|consider selling|high.probability|smart|optimal|best move|gain a competitive edge|make smarter' \
-    app/views/ 2>/dev/null \
+  ( grep -rEin \
+      'recommend|suggest|you should|consider buying|consider selling|high.probability|smart|optimal|best move|gain a competitive edge|make smarter' \
+      app/views/ 2>/dev/null || true ) \
+    | ( grep -v -E '^app/views/legal/' || true ) \
     | wc -l | tr -d ' '
 )
 
