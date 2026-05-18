@@ -5,7 +5,8 @@ RSpec.describe "Registrations", type: :request do
     it "renders the registration page" do
       get register_path
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Create your account")
+      expect(response.body).to include("Crea tu cuenta")
+      expect(response.body).to include("consents_data_processing")
     end
 
     it "redirects to dashboard if already logged in" do
@@ -25,7 +26,8 @@ RSpec.describe "Registrations", type: :request do
         email: "jane@example.com",
         password: "password123",
         password_confirmation: "password123",
-        invite_code: invite.code
+        invite_code: invite.code,
+        consents_data_processing: "1"
       }
     end
 
@@ -93,6 +95,28 @@ RSpec.describe "Registrations", type: :request do
       post register_path, params: valid_params.merge(password: "short", password_confirmation: "short")
       expect(response.body).to include("Jane Doe")
       expect(response.body).to include("jane@example.com")
+    end
+
+    it "rejects registration when Art. 8 patrimonial consent is not granted" do
+      # Form arrives without `consents_data_processing` when the checkbox is unchecked
+      post register_path, params: valid_params.except(:consents_data_processing)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("autorizar")
+    end
+
+    it "persists the Art. 8 consent timestamp on successful registration" do
+      post register_path, params: valid_params
+      user = User.find_by(email: "jane@example.com")
+      expect(user.consents_data_processing_at).to be_present
+    end
+
+    it "preserves the consent checkbox state when re-rendering after a non-consent validation error" do
+      # User checked the consent box but mistyped the password confirmation.
+      # The checkbox should still be checked on re-render — forcing them to
+      # re-check it on every form error is bad UX.
+      post register_path, params: valid_params.merge(password_confirmation: "different")
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to match(/name="consents_data_processing"[^>]*checked/)
     end
   end
 end
