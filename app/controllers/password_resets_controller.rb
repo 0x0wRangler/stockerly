@@ -1,6 +1,9 @@
 class PasswordResetsController < ApplicationController
   layout "public"
 
+  INVALID_TOKEN_MESSAGE = "El enlace de restablecimiento es inválido o expiró.".freeze
+  private_constant :INVALID_TOKEN_MESSAGE
+
   rate_limit to: 3, within: 1.hour, only: :create
 
   before_action :find_user_by_token, only: [ :edit ]
@@ -9,7 +12,7 @@ class PasswordResetsController < ApplicationController
 
   def create
     Identity::UseCases::RequestPasswordReset.call(params: { email: params[:email] })
-    redirect_to login_path, notice: "If that email exists, you'll receive reset instructions shortly."
+    redirect_to login_path, notice: "Si ese correo está registrado, recibirás instrucciones para restablecer tu contraseña en unos minutos."
   end
 
   def edit; end
@@ -19,10 +22,11 @@ class PasswordResetsController < ApplicationController
 
     case result
     in Dry::Monads::Success
-      redirect_to login_path, notice: "Password reset successfully. Please sign in."
-    in Dry::Monads::Failure[ :invalid_token, message ]
-      redirect_to forgot_password_path, alert: message
-    in Dry::Monads::Failure[ :validation, _ ]
+      redirect_to login_path, notice: "Contraseña restablecida correctamente. Inicia sesión con tu nueva contraseña."
+    in Dry::Monads::Failure[ :invalid_token ]
+      redirect_to forgot_password_path, alert: INVALID_TOKEN_MESSAGE
+    in Dry::Monads::Failure[ :validation, user ]
+      @user = user
       render :edit, status: :unprocessable_content
     end
   end
@@ -31,10 +35,7 @@ class PasswordResetsController < ApplicationController
 
   def find_user_by_token
     @user = User.find_by_password_reset_token(params[:token])
-
-    unless @user
-      redirect_to forgot_password_path, alert: "Invalid or expired reset link."
-    end
+    redirect_to forgot_password_path, alert: INVALID_TOKEN_MESSAGE unless @user
   end
 
   def password_params
