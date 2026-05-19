@@ -22,6 +22,7 @@ module Trading
 
         weekly_insight = compute_weekly_insight(portfolio, currency)
         upcoming_maturities = portfolio ? load_upcoming_maturities(portfolio) : []
+        cetes_summary = portfolio ? compute_cetes_summary(upcoming_maturities, portfolio, currency) : nil
 
         Success({
           summary: summary,
@@ -33,6 +34,7 @@ module Trading
           fear_greed: fear_greed,
           weekly_insight: weekly_insight,
           upcoming_maturities: upcoming_maturities,
+          cetes_summary: cetes_summary,
           currency: currency
         })
       end
@@ -71,6 +73,38 @@ module Trading
                  .where(maturity_date: Date.current..(Date.current + UPCOMING_MATURITY_WINDOW_DAYS.days))
                  .order(:maturity_date)
                  .includes(:asset)
+      end
+
+      # Aggregate of fixed-income positions inside the upcoming-maturities
+      # window: count, total face value in the user's preferred currency,
+      # and days-to-soonest. Used by the dashboard CETES KPI card so the
+      # MX investor sees liquidity-event exposure at a glance.
+      #
+      # Skips positions whose FX rate is missing (rather than failing the
+      # whole dashboard) — the count reflects only convertible positions.
+      def compute_cetes_summary(maturities, portfolio, currency)
+        today = Date.current
+        count = 0
+        total = 0
+        soonest = nil
+
+        maturities.each do |p|
+          next unless p.asset.asset_type_fixed_income?
+
+          value =
+            begin
+              portfolio.convert(p.market_value, from: p.asset.currency, to: currency)
+            rescue RuntimeError
+              next
+            end
+
+          count += 1
+          total += value
+          days = (p.maturity_date - today).to_i
+          soonest = days if soonest.nil? || days < soonest
+        end
+
+        { count: count, total_value: total, soonest_days: soonest }
       end
     end
   end
