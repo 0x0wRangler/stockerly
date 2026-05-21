@@ -195,6 +195,107 @@ RSpec.describe MarketData::Gateways::YahooFinanceGateway do
     end
   end
 
+  describe "#fetch_earnings" do
+    context "with a single confirmed earnings date and an estimate" do
+      before do
+        stub_yahoo_earnings("WALMEX.MX",
+          dates: [ Date.new(2026, 5, 28) ],
+          estimate: 1.24
+        )
+      end
+
+      it "returns Success with one parsed event" do
+        result = gateway.fetch_earnings("WALMEX.MX")
+
+        expect(result).to be_success
+        events = result.value!
+        expect(events.length).to eq(1)
+        expect(events.first).to include(
+          report_date: Date.new(2026, 5, 28),
+          fiscal_quarter: 2,
+          fiscal_year: 2026,
+          confirmed: true
+        )
+        expect(events.first[:estimated_eps]).to eq(1.24.to_d)
+      end
+    end
+
+    context "always reports actual_eps as nil for upcoming events" do
+      before do
+        stub_yahoo_earnings("WALMEX.MX",
+          dates: [ Date.new(2026, 5, 28) ],
+          estimate: 1.24
+        )
+      end
+
+      # Regression: calendarEvents only carries the UPCOMING report — Yahoo
+      # has no `actual` field on this endpoint. An earlier version of
+      # parse_earnings mistakenly assigned `earningsChart.currentQuarterEstimate`
+      # (still an estimate) to actual_eps when earningsAverage was missing,
+      # which made every upcoming row render as "Reportado".
+      it "does not populate actual_eps from estimate-shaped fields" do
+        event = gateway.fetch_earnings("WALMEX.MX").value!.first
+        expect(event[:actual_eps]).to be_nil
+      end
+    end
+
+    context "with an unconfirmed date range" do
+      before do
+        stub_yahoo_earnings("GFNORTEO.MX",
+          dates: [ Date.new(2026, 7, 21), Date.new(2026, 7, 25) ],
+          estimate: 5.42
+        )
+      end
+
+      it "uses the upper bound and marks the event unconfirmed" do
+        result = gateway.fetch_earnings("GFNORTEO.MX")
+
+        expect(result).to be_success
+        event = result.value!.first
+        expect(event[:report_date]).to eq(Date.new(2026, 7, 25))
+        expect(event[:confirmed]).to be false
+      end
+    end
+
+    context "when the response carries no earnings block" do
+      before { stub_yahoo_earnings("EMPTY.MX", dates: []) }
+
+      it "returns Success with an empty array" do
+        expect(gateway.fetch_earnings("EMPTY.MX").value!).to eq([])
+      end
+    end
+
+    context "when the response has no quoteSummary result" do
+      before { stub_yahoo_earnings_empty("UNKNOWN.MX") }
+
+      it "returns Success([]) so the caller doesn't block" do
+        result = gateway.fetch_earnings("UNKNOWN.MX")
+        expect(result).to be_success
+        expect(result.value!).to eq([])
+      end
+    end
+
+    context "when rate limited (429)" do
+      before { stub_yahoo_earnings_error("WALMEX.MX", status: 429) }
+
+      it "returns Failure with :rate_limited" do
+        result = gateway.fetch_earnings("WALMEX.MX")
+        expect(result).to be_failure
+        expect(result.failure.first).to eq(:rate_limited)
+      end
+    end
+
+    context "when server error (500)" do
+      before { stub_yahoo_earnings_error("WALMEX.MX", status: 500) }
+
+      it "returns Failure with :gateway_error" do
+        result = gateway.fetch_earnings("WALMEX.MX")
+        expect(result).to be_failure
+        expect(result.failure.first).to eq(:gateway_error)
+      end
+    end
+  end
+
   describe "#fetch_bulk_prices" do
     before do
       stub_yahoo_finance_bulk({
