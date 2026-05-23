@@ -35,8 +35,10 @@ RSpec.describe "PWA", type: :request do
       get "/service-worker.js"
 
       expect(response.body).to include("/offline.html")
-      expect(response.body).to include("/icon-192.svg")
-      expect(response.body).to include("/icon-512.svg")
+      expect(response.body).to include("/favicon.svg?v=2")
+      expect(response.body).to include("/icon-192.png?v=2")
+      expect(response.body).to include("/icon-512.png?v=2")
+      expect(response.body).to include("/apple-touch-icon.png?v=2")
     end
   end
 
@@ -54,7 +56,7 @@ RSpec.describe "PWA", type: :request do
     it "includes manifest link and theme-color meta tag" do
       get login_path
 
-      expect(response.body).to include('<link rel="manifest" href="/manifest.json">')
+      expect(response.body).to include('<link rel="manifest" href="/manifest.json?v=2">')
       expect(response.body).to include('<meta name="theme-color" content="#5B6CFF">')
     end
   end
