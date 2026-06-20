@@ -188,7 +188,7 @@ This section is a workflow guide for future sessions with visual tools (Claude D
 
 ### 10.1 End-to-end workflow (canonical post-S07)
 
-The full operational workflow — expert-panel consultation → self-contained markdown prompt → GitHub issue comment → external generation → `.local/design-mockups/` storage → Lumen-fidelity audit → ERB translation with Tailwind tokens — is documented in the `project_design_workflow` memory entry (`.claude/memory/project_design_workflow.md`).
+The full operational workflow — expert-panel consultation → self-contained markdown prompt → GitHub issue comment → external generation → `.local/design-mockups/` storage → Lumen-fidelity audit → ERB translation with Tailwind tokens — is documented in the `project_design_workflow` memory entry (`.kwik-e/memory/project_design_workflow.md`).
 
 Validated at S07 close on five screens (`/privacy`, `/admin/invites`, `/welcome`, `/help`, `/report-bug`) with zero regenerations and zero mockup-vs-implementation drift. Adopt the same pattern for any new screen in S08+.
 
