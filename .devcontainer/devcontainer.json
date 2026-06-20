@@ -15,7 +15,8 @@
     "ghcr.io/devcontainers/features/sshd:1": {},
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false
-    }
+    },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
   },
 
   "forwardPorts": [4100, 6543],
@@ -24,6 +25,11 @@
     "DATABASE_HOST": "db",
     "DATABASE_USERNAME": "postgres",
     "DATABASE_PASSWORD": "postgres"
+  },
+
+  "remoteEnv": {
+    "PATH": "/workspaces/kwik-e-mart/bin:${containerEnv:PATH}",
+    "KWIK_E_HOME": "/workspaces/kwik-e-mart"
   },
 
   "postCreateCommand": ".devcontainer/post-create.sh",
