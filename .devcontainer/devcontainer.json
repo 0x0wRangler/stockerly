@@ -27,11 +27,6 @@
     "DATABASE_PASSWORD": "postgres"
   },
 
-  "remoteEnv": {
-    "PATH": "/workspaces/kwik-e-mart/bin:${containerEnv:PATH}",
-    "KWIK_E_HOME": "/workspaces/kwik-e-mart"
-  },
-
   "postCreateCommand": ".devcontainer/post-create.sh",
 
   "customizations": {
