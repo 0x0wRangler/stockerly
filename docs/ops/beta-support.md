@@ -405,3 +405,29 @@ If a sync is broken upstream and you don't want the hourly Sentry noise until th
 3. Re-deploy. Document the silenced sync + ETA in the deploy notes so it doesn't stay silenced forever.
 
 To add a new monitored sync, append its exact `task_name` string to `CheckSyncHealthJob::CRITICAL_SYNCS` — must match the literal string used in the corresponding `SystemLog.create!` / `log_sync_success` / `log_sync_failure` call (see `app/jobs/concerns/sync_logging.rb`).
+
+## 8. Email delivery query
+
+Resend webhooks (`POST /webhooks/resend`) persist every email lifecycle event to the `email_events` table. Use it to answer "did the amigo get the invite?" without poking through provider dashboards.
+
+**Setup requirement.** `RESEND_WEBHOOK_SECRET` (the `whsec_...` signing secret from the Resend dashboard) MUST be set in the production env. The controller rejects every request with `401` when it's missing — no dev fallback. The webhook URL to register in Resend is `https://stockerly.notdefined.dev/webhooks/resend`.
+
+**Common queries** (run from `bin/kamal console` on prod):
+
+```ruby
+# "Did amigo X get the invite?"
+EmailEvent.for_email("amigo@example.com").recent.pluck(:event_type, :occurred_at)
+
+# "Was a specific message delivered?"
+EmailEvent.for_message("email_abc123").by_type("delivered").any?
+
+# "Did anyone bounce in the last week?"
+EmailEvent.by_type("bounced").where("occurred_at > ?", 7.days.ago).pluck(:email, :occurred_at)
+
+# "Show me the full lifecycle of one message (sent → delivered → opened → clicked)"
+EmailEvent.for_message("email_abc123").recent.pluck(:event_type, :occurred_at)
+```
+
+**Event types** mirror Resend with the `email.` prefix stripped: `sent`, `delivered`, `bounced`, `complained`, `opened`, `clicked`.
+
+**Limitations.** Stockerly sends mail via Resend SMTP (no Ruby SDK), so we have no programmatic `message_id` at send time. The `sent` row is created by the webhook itself when Resend fires `email.sent`. If a webhook is dropped, that send is silently missing from the table — diagnose via Resend's own dashboard log retention.
